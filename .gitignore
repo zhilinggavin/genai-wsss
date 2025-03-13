@@ -1,6 +1,6 @@
 __pycache__/
 .ipynb_checkpoints/
-data/raw/
-data/processed/
-experiments/checkpoints/
-experiments/logs/
+data/*/raw/
+data/*/processed/
+experiments/*/checkpoints/
+experiments/*/logs/
