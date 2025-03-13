@@ -9,7 +9,7 @@ This dataset comprises Chest HRCT scans from 227 patients and includes cases of 
 
 **Processed**: 
 - Pre-processing pipeline: yingying completed
-- Filter Selection: Only contains slices bewteen top and end slices of lung. The top and last slices are selected based on a minimum lung area of XXX(to be checked: 100) pixels.
+- Filter Selection: Only contains slices bewteen top and end slices of lung. The top and last slices are selected based on a minimum lung area of 400(to be removed after re-training of U-Net) pixels.
 
 ### In-House - OSIC Firbosis Dataset
 **Annotated Source File Location**  

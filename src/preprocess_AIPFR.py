@@ -15,7 +15,7 @@ import glob
 from torchvision.transforms import functional as trans_fn
 from torchvision.transforms import InterpolationMode
 from tqdm import tqdm
-from debug_inference import model_loading, infer_main
+# from debug_inference import model_loading, infer_main
 import torch
 
 def get_pixels_hu(slices):
@@ -178,9 +178,9 @@ def preprocessing(slice):
 
     return 
 
-def segmentation_inference(model, device, img_scale, base_dir, case_name, csv_file_path, save_dir = None):
-    infer_main(model, device, base_dir, case_name, img_scale, csv_file_path, save_dir)
-    print(f'Case {case_name} segmentation inference done!')
+# def segmentation_inference(model, device, img_scale, base_dir, case_name, csv_file_path, save_dir = None):
+#     infer_main(model, device, base_dir, case_name, img_scale, csv_file_path, save_dir)
+#     print(f'Case {case_name} segmentation inference done!')
     
 def calculate_slice_volumes(csv_file_path):
     '''
@@ -258,46 +258,40 @@ import copy
 # Count and plot results
 
 if __name__ == "__main__":
+    # Specify the root directory for the raw files - DCM files
+    root_directory = "../data/AIPFR/raw/AUSTRALIAN_REGISTRY"  # Replace with your folder path
+    assert os.path.exists(root_directory), f"Error: The directory '{root_directory}' does not exist."
     
     '''
     Model loading
     '''
     
-    device = 'cuda'
-    # # WSSS unet model
-    # model_path = '/media/NAS06/gavinyue/disentanglement/scripts_segmentation/unet_checkpoints/No4.3_Syn_1.50Cov+RealVal_eps400_bs20/fold5_best_dice_epoch45.pth'
-    # base_dir = './exp_img'
+    # device = 'cuda'
     
     # full_supervised unet model
-    model_path = '/media/NAS06/gavinyue/disentanglement/scripts_segmentation/unet_checkpoints/No1_Real_eps300_bs20/fold5_best_dice_epoch205.pth'
-    base_dir = './quantification_result' # for saving the quantification results and datasets
-    save_dir = join(base_dir, 'full_supervised_unet') # for saving the segmentation results
-    model = model_loading(model_path, device)
+    # model_path = '/media/NAS06/gavinyue/disentanglement/scripts_segmentation/unet_checkpoints/No1_Real_eps300_bs20/fold5_best_dice_epoch205.pth'
+    base_dir = '../data/AIPFR/processed_test' # for saving the preprocessed datasets 
+    save_dir = '../data/AIPFR/processed_quant' # for saving the quantification results 
+    # model = model_loading(model_path, device)
 
-    root_directory = "/media/NAS01/AUSTRALIAN_REGISTRY/"  # Replace with your folder path
+
+
     threshold = 150  
    
 
 
     # Print the total number of cases and the count of cases above the threshold
-    interval_statistics, total_cases, cases_above_threshold = count_dcm_files_by_intervals(root_directory, threshold=threshold)
+    interval_statistics, total_cases, interval_count_above_threshold = count_dcm_files_by_intervals(root_directory, threshold=threshold)
     # plot_histogram(interval_statistics)
     print(f"Total number of cases: {total_cases}")
-    print(f"Number of cases with more than {threshold} DCM files: {cases_above_threshold}")
+    # print(f"Number of cases with more than {threshold} DCM files: {interval_count_above_threshold+1}")
 
     # Print results
-    threshold_below = 60
     count_below_threshold, cases_below_threshold = find_cases_below_threshold(root_directory, threshold)
     print(f"Number of cases with fewer than {threshold} DCM files: {count_below_threshold}")
-    # print("Cases Below:")
-    # for case, dcm_count in cases_below_threshold:
-    #     print(f"{case}: {dcm_count} DCM files")
 
-
-    # Print results
-    threshold_above = 150
     count_above_threshold, cases_above_threshold = find_cases_above_threshold(root_directory, threshold)
-    print(f"Number of cases with more than {threshold} DCM files: {count_below_threshold}")
+    print(f"Number of cases with more than {threshold} DCM files: {count_above_threshold}")
     
     case_count = 0
     # print("Cases Above:")
@@ -386,9 +380,7 @@ if __name__ == "__main__":
         # mask_two = masks_lung[i] == 2
         # plt.imsave(f'{base_dir}/lung_mask_two.png', mask_two, cmap='gray')
         
-        
-        # model = \
-        # model_weight = 
+    
         total_pixel = 0
         
         print("slice preprocessiong Started")
@@ -423,7 +415,7 @@ if __name__ == "__main__":
             
             slice_name = f'case{case_name}_slice{z:03d}'
             img_slice_masked = Image.fromarray(slice_masked)
-            
+            '''Preprocessing Image for Input of Segmentation model'''
             # TODO
             # This step resizes the image to 256x256 using the same resize method as the previous image preprocessing.
             # Consider changing to the PIL resize method used in dataset processing for model input: img.resize((newW, newH), resample=Image.BICUBIC)
@@ -444,16 +436,17 @@ if __name__ == "__main__":
             data = {
                 'Case': [case_name],
                 'ID': [slice_name],
-                'voxel': [voxel]
+                'size': [img_slice_resized.size[0]],
+                'voxel': [voxel],
             }
-            if pixel_num_lung > 0:
-                data['pixel_num_lung'] = [pixel_num_lung]
+            # if pixel_num_lung > 0:
+            data['pixel_num_lung'] = [pixel_num_lung]
             
             df = pd.DataFrame(data)
             df.to_csv(csv_file_path, mode='a', header=not os.path.exists(csv_file_path), index=False)
         
         print(f'Case {basename(case)} processed and saved successfully')
- 
+        break
         
     print("All cases processed and saved successfully")         
 

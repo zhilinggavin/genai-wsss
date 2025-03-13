@@ -2,5 +2,6 @@ __pycache__/
 .ipynb_checkpoints/
 data/*/raw/
 data/*/processed/
+data/*/processed_test/
 experiments/*/checkpoints/
 experiments/*/logs/
