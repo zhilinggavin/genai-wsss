@@ -270,7 +270,7 @@ if __name__ == "__main__":
     
     # full_supervised unet model
     # model_path = '/media/NAS06/gavinyue/disentanglement/scripts_segmentation/unet_checkpoints/No1_Real_eps300_bs20/fold5_best_dice_epoch205.pth'
-    base_dir = '../data/AIPFR/processed_test' # for saving the preprocessed datasets 
+    base_dir = '../data/AIPFR/processed_new' # for saving the preprocessed datasets 
     save_dir = '../data/AIPFR/processed_quant' # for saving the quantification results 
     # model = model_loading(model_path, device)
 
@@ -311,18 +311,9 @@ if __name__ == "__main__":
 
         
         os.makedirs(case_dir, exist_ok=True)
-        csv_file_path = join(save_dir, case_name+'_pixel_check.csv')
-        
-        try:
-            df_quantify = pd.read_csv(join(os.path.dirname(csv_file_path), 'quantification.csv'))
-            if case_name in df_quantify['Case'].values:
-                print(f"Skipping {case} as it already exists in quantification.csv")
-                continue
-        except FileNotFoundError:
-            pass
-        # if os.path.exists(case_dir) and glob.glob(os.path.join(case_dir, '*.png')):
-        #     print(f"Skipping {case} as it already exists and contains PNG files")
-        #     continue
+        # csv_file_path = join(save_dir, case_name+'_pixel_check.csv')
+        csv_file_path = join(save_dir, 'slice_pixel_check.csv')
+
         
         print(f"\nProcessing {case}: {dcm_count} DCM files")
         
@@ -438,15 +429,17 @@ if __name__ == "__main__":
                 'ID': [slice_name],
                 'size': [img_slice_resized.size[0]],
                 'voxel': [voxel],
+                'pixel_num_lung': pixel_num_lung
             }
             # if pixel_num_lung > 0:
-            data['pixel_num_lung'] = [pixel_num_lung]
+            # data['pixel_num_lung'] = [pixel_num_lung]
             
             df = pd.DataFrame(data)
             df.to_csv(csv_file_path, mode='a', header=not os.path.exists(csv_file_path), index=False)
-        
+
         print(f'Case {basename(case)} processed and saved successfully')
-        break
+        # if case_count == 2:
+        #     break
         
     print("All cases processed and saved successfully")         
 
