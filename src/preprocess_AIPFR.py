@@ -17,6 +17,7 @@ from torchvision.transforms import InterpolationMode
 from tqdm import tqdm
 # from debug_inference import model_loading, infer_main
 import torch
+from datetime import datetime
 
 def get_pixels_hu(slices):
     image = np.stack([s.pixel_array for s in slices])
@@ -270,8 +271,17 @@ if __name__ == "__main__":
     
     # full_supervised unet model
     # model_path = '/media/NAS06/gavinyue/disentanglement/scripts_segmentation/unet_checkpoints/No1_Real_eps300_bs20/fold5_best_dice_epoch205.pth'
-    base_dir = '../data/AIPFR/processed_new' # for saving the preprocessed datasets 
+    base_dir = '../data/AIPFR/processed' # for saving the preprocessed datasets
     save_dir = '../data/AIPFR/processed_quant' # for saving the quantification results 
+    
+    # Add the current time postfix to the base_dir and save_dir
+    current_time = datetime.now()
+    formatted_time = current_time.strftime("%Y-%m-%d_%H-%M")
+    base_dir = base_dir + '_' + formatted_time
+    save_dir = save_dir + '_' + formatted_time
+    os.makedirs(base_dir, exist_ok=True)
+    os.makedirs(save_dir, exist_ok=True)
+    
     # model = model_loading(model_path, device)
 
 
@@ -312,7 +322,7 @@ if __name__ == "__main__":
         
         os.makedirs(case_dir, exist_ok=True)
         # csv_file_path = join(save_dir, case_name+'_pixel_check.csv')
-        csv_file_path = join(save_dir, 'slice_pixel_check.csv')
+        csv_file_path = join(save_dir, 'slice_check_test.csv')
 
         
         print(f"\nProcessing {case}: {dcm_count} DCM files")
@@ -429,7 +439,8 @@ if __name__ == "__main__":
                 'ID': [slice_name],
                 'size': [img_slice_resized.size[0]],
                 'voxel': [voxel],
-                'pixel_num_lung': pixel_num_lung
+                'pixel_num_lung': [pixel_num_lung],
+                'slice_volume_lung': [voxel * pixel_num_lung]
             }
             # if pixel_num_lung > 0:
             # data['pixel_num_lung'] = [pixel_num_lung]
@@ -438,8 +449,8 @@ if __name__ == "__main__":
             df.to_csv(csv_file_path, mode='a', header=not os.path.exists(csv_file_path), index=False)
 
         print(f'Case {basename(case)} processed and saved successfully')
-        # if case_count == 2:
-        #     break
+        if case_count == 2:
+            break
         
     print("All cases processed and saved successfully")         
 

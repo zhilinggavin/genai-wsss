@@ -1,7 +1,9 @@
 __pycache__/
 .ipynb_checkpoints/
 data/*/raw/
-data/*/processed/
-data/*/processed_new/
+data/*/processed*/
 experiments/*/checkpoints/
 experiments/*/logs/
+
+# keep the following directories
+!data/*/processed_quant/
