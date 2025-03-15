@@ -4,6 +4,7 @@ data/*/raw/
 data/*/processed*/
 experiments/*/checkpoints/
 experiments/*/logs/
+experiments/**/pred_mask/
 
 # keep the following directories
 !data/*/processed_quant/
