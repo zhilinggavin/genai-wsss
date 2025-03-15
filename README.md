@@ -40,3 +40,21 @@ This dataset comprises Chest HRCT scans from 227 patients and includes cases of 
 
 ### Open Souce - Kits23 Dataset
 contains kidney, tumour, etc... Masks for each elements.
+
+## Results
+
+Results are saved in the `experiments` directory under each model's folder.
+
+**Models**: We have evaluated the performance of three segmentation models:
+1. fully_supervised_unet
+2. wsss_coin
+3. wsss_unet
+
+Each model has **segmentation results & quantitative results**.
+
+- Segmentation results are saved under `/model_name/results/dataset_name/pred_mask/`.
+- Quantitative results are saved under `/model_name/results/dataset_name/quant/`.
+
+Quantitative results contain:
+- 2D information for each slice
+- 3D information for each case
