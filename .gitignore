@@ -2,6 +2,7 @@ __pycache__/
 .ipynb_checkpoints/
 data/*/raw/
 data/*/processed*/
+data/*/3d_visual/
 experiments/*/checkpoints/
 experiments/*/logs/
 experiments/**/pred_mask/
