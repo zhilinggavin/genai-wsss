@@ -4,7 +4,7 @@ from tqdm import tqdm
 from collections import defaultdict
 from itertools import islice
 import torch
-from fn_stylegan_osic import prepare_dataset
+from .fn_stylegan_osic import prepare_dataset
 
 # Constants
 BATCH_SIZE = 8

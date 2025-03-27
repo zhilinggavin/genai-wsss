@@ -8,7 +8,7 @@ from torchvision.transforms import functional as trans_fn
 from tqdm import tqdm
 from torchvision.transforms import InterpolationMode
 from itertools import islice
-from fn_stylegan_osic import prepare_dataset
+from .fn_stylegan_osic import prepare_dataset
 
 # Constants
 GPU_NUM = '0'
