@@ -21,4 +21,4 @@ jobs:
         pip install -r requirements.txt
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*fn_stylegan_osic.py')
+        pylint $(git ls-files '*test2csv.py')
