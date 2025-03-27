@@ -21,6 +21,30 @@ This dataset comprises Chest HRCT scans from 227 patients and includes cases of 
 **Annotated Source File Location**  
 📂 `/media/NAS04/yyxxxx/prognostic_result/dataset/data_fibrosis/annotation_all`
 
+**Preprocessed size350 slices File Location**  
+📂 `/media/NAS04/yyxxxx/prognostic_result/dataset/data_fibrosis/gavin/slice_select`  
+--> Now stored at `data/OSIC/preprocessed_size350`
+
+- `fibrosis_selected`
+- `no_fibrosis_selected`
+- `no_fibrosis_covid`
+
+**Final processed size256 slices File Location**  
+📂 `data/OSIC/processed`  
+processing python file: `data/OSIC/scripts/processing_fibrosis.py`
+```
+This script processes fibrosis images from the preprocessed OSIC dataset (size: 350x350).
+The processed images will be resized to 256x256 and saved in the directory:
+    data/OSIC/processed/fibrosis
+```
+
+The original fibrosis label is an annotation, which is converted to a segmentation mask through processing.
+- `fibrosis_selected_gt`
+
+**Original Slice Name Track Record**  
+The processed slices are saved with randomized names in the format `orig_xxxxx.png`.  
+The corresponding original names can be found in the record file: `data/OSIC/origname_record_fibrosis.csv`.
+
 **Patient & Annotation Overview**  
 - **51 patients**  
 - **Annotated by 4 doctors**
