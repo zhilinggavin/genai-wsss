@@ -27,8 +27,6 @@ def txt_to_csv(input_txt_file, output_csv_file, delimiter="\t"):
         print(f"I/O error: {e}")
     except csv.Error as e:
         print(f"CSV error: {e}")
-    except Exception as e:  # Optional: Keep this for unexpected errors
-        print(f"Unexpected error during conversion: {e}")
 
 if __name__ == "__main__":
     INPUT_TXT = "input.txt"  # Replace with your .txt file path
