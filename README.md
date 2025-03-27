@@ -82,3 +82,21 @@ Each model has **segmentation results & quantitative results**.
 Quantitative results contain:
 - 2D information for each slice
 - 3D information for each case
+
+### Project Directory Structure
+
+The following is the directory structure of the project, showcasing the organization of files and folders:
+```plaintext
+my-repo/
+├── .github/
+│   └── workflows/
+│       └── pylint.yml
+├── data/
+│   └── OSIC/
+│       └── scripts/
+│           ├── get_random_name_OSIC.py
+│           └── processing_fibrosis.py
+├── src/
+│   └── preprocess_AIPFR.py
+├── requirements.txt
+└── README.md
