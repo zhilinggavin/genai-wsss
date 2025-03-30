@@ -21,7 +21,7 @@ This dataset comprises Chest HRCT scans from 227 patients and includes cases of 
 **Annotated Source File Location**  
 📂 `/media/NAS04/yyxxxx/prognostic_result/dataset/data_fibrosis/annotation_all`
 
-**Preprocessed size350 slices File Location**  
+**Preprocessed Size350 Slices File Location**  
 📂 `/media/NAS04/yyxxxx/prognostic_result/dataset/data_fibrosis/gavin/slice_select`  
 --> Now stored at `data/OSIC/preprocessed_size350`
 
@@ -29,7 +29,7 @@ This dataset comprises Chest HRCT scans from 227 patients and includes cases of 
 - `no_fibrosis_selected`
 - `no_fibrosis_covid`
 
-**Final processed size256 slices File Location**  
+**Final Processed Size256 Slices File Location**  
 📂 `data/OSIC/processed`  
 processing python file: `data/OSIC/scripts/processing_fibrosis.py`
 ```
@@ -38,8 +38,41 @@ The processed images will be resized to 256x256 and saved in the directory:
     data/OSIC/processed/fibrosis
 ```
 
+**GT Process and Location**  
 The original fibrosis label is an annotation, which is converted to a segmentation mask through processing.
-- `fibrosis_selected_gt`
+- **`fibrosis_gt`**:  
+  The ground truth (GT) annotation is processed and converted into a filled segmentation mask.  
+  **Note**: Code for this process is yet to be added.  
+  Try to use new kernel `kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))`
+
+- **Annotation Issues**:  
+  Some clinician-made errors (e.g., annotations not closed or continuous) in the original annotations result in segmentation masks that are not properly closed or filled.  
+  - **Case 33**: Annotated by clinician **Tiru**, contains more errors compared to others.  
+  - **Case 34**: Less, a few failed slices. e.g. `034_fibrosis_061_mask.png`
+  - **Other Cases**: No significant issues found.
+
+  Additionally, some clinicians tend to mark larger annotations (e.g., Cases 33 and 34), while some tend to mark very small annotations.
+
+- **Example**:  
+  Below are examples of segmentation masks with errors:  
+<figure style="display: flex; justify-content: space-between;">
+    <div style="text-align: center;">
+        <img src="imgs/033_fibrosis_044_anno.png" alt="033_fibrosis_044_annotation" width="90%">
+        <figcaption>Annotation: 033_fibrosis_044</figcaption>
+    </div>
+    <div style="text-align: center;">
+        <img src="imgs/033_fibrosis_044_mask.png" alt="033_fibrosis_044_mask" width="90%">
+        <figcaption>Mask: 033_fibrosis_044</figcaption>
+    </div>
+    <div style="text-align: center;">
+        <img src="imgs/033_fibrosis_119_anno.png" alt="033_fibrosis_119_annotation" width="90%">
+        <figcaption>Annotation: 033_fibrosis_119</figcaption>
+    </div>
+    <div style="text-align: center;">
+        <img src="imgs/033_fibrosis_119_mask.png" alt="033_fibrosis_119_mask" width="90%">
+        <figcaption>Mask: 033_fibrosis_119</figcaption>
+    </div>
+</figure>
 
 **Original Slice Name Track Record**  
 The processed slices are saved with randomized names in the format `orig_xxxxx.png`.  
