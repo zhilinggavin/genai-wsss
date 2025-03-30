@@ -537,6 +537,8 @@ def prepare_dataset(bs, dataname='fibrosis', train_mode=False, exp=None):
                 slice_nofibrosis_covid = [i for i in os.listdir('/media/NAS04/yyfang/prognostic_result/dataset/data_fibrosis/gavin/slice_select/no_fibrosis_covid/')]
                 difference = len(slice_fibrosis) - len(slice_nofibrosis)
                 slice_nofibrosis = slice_nofibrosis_covid[:difference]
+            elif dataname == 'fibrosis':
+                print('Only fibrosis data is used')
             else:
                 print('slice_nofibrosis is from no_fibrosis data, no covid data')
     
