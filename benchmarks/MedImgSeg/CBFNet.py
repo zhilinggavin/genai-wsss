@@ -117,6 +117,9 @@ class CBFNet(object) :
         elif(self.dataset=="BraTS"):
             dataset_A = "563_A_weak"
             dataset_B = "563_B_weak"
+        elif(self.dataset=="OSIC"):
+            dataset_A = "fibrosis"
+            dataset_B = "fibrosis"
         else:
             print("dataset name is wrong")
             sys.exit(1)

@@ -7,7 +7,9 @@ experiments/*/checkpoints/
 experiments/*/logs/
 experiments/**/pred_mask/
 src/Pytorch_UNet/
+benchmarks/MedImgSeg/dataset/
 
 # keep the following directories
 !data/*/processed_quant/
 experiments/**/3d_visual/
+

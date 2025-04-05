@@ -92,12 +92,19 @@ def main():
     
     # Custom debugging:
     #quickly test on BraTS dataset
-    # python -u main.py --light True --dataset BraTS --folder brats_1 --resume False --phase test 
+    # python -u main.py --light True --dataset BraTS --folder brats_1 --resume False --iteration 7000 --lr 0.0001 --adv_weight 1 --cycle_weight 10 --identity_weight 10 --cam_weight 1000 --recon_weight 10 --phase train
     args.light = True
-    args.dataset = 'BraTS'
-    args.folder = 'brats_1'
+    args.dataset = 'OSIC'
+    args.folder = ''
     args.resume = False
-    args.phase = 'test'
+    args.iteration = 7000
+    args.lr = 0.0001
+    args.adv_weight = 1
+    args.cycle_weight = 10
+    args.identity_weight = 10
+    args.cam_weight = 1000
+    args.recon_weight = 10
+    args.phase = 'train'
     
     
     if args is None:
