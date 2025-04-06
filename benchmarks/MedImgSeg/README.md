@@ -89,3 +89,5 @@ your_project_location
      - ..
 ```
 
+## The original reference paper is AttentionGAN
+code: `https://github.com/Ha0Tang/AttentionGAN`, generating attention mask
