@@ -14,3 +14,4 @@ benchmarks/SEAM/models/
 # keep the following directories
 !data/*/processed_quant/
 experiments/**/3d_visual/
+benchmarks/diffusion-anomaly/data/brats/training/000002/brats_train_001_t1ce_081_w.nii.gz
