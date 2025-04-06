@@ -49,6 +49,8 @@ your_project_location
    - ISIC
      - ...
 ```
+`563_A_weak` means abnormal imgs (true anno); `563_B_weak` means health imgs (false anno)
+
 ## Quickly Test
 You can download the trained models we provide and put them in the trained model directory for quickly test.
 Run demo.sh to test the model segmentation performance, and the segmentation results are saved in the result directory. (model location:https://pan.baidu.com/s/1oWbK0j5Xl6E2MUQU6TCRzg, password:1111)

@@ -119,7 +119,7 @@ class CBFNet(object) :
             dataset_B = "563_B_weak"
         elif(self.dataset=="OSIC"):
             dataset_A = "fibrosis"
-            dataset_B = "fibrosis"
+            dataset_B = "no_fibrosis"
         else:
             print("dataset name is wrong")
             sys.exit(1)
@@ -396,7 +396,7 @@ class CBFNet(object) :
                     real_A2, real_B2 = real_A2.to(self.device), real_B2.to(self.device)
                     test_start += 1
 
-                    # fake_A2B, _, fake_A2B_heatmap, att_maskA2B, contentA2B, real_A2_r = self.genA2B(real_A2)
+                    fake_A2B, _, fake_A2B_heatmap, att_maskA2B, contentA2B, realA_r = self.genA2B(real_A2)
                     # fake_B2A, _, fake_B2A_heatmap, att_maskB2A, contentB2A, real_B2_r = self.genB2A(real_B2)
 
                     A2B = np.concatenate((A2B, np.concatenate((RGB2BGR(tensor2numpy(denorm(real_A[0]))),
@@ -406,6 +406,7 @@ class CBFNet(object) :
                                                                RGB2BGR(tensor2numpy(denorm(contentA2B[0]))),
                                                                RGB2BGR(tensor2numpy(denorm(realA_r[0])))), 0)), 1)
 
+                os.makedirs(os.path.join(self.result_dir, self.dataset, self.folder, 'img'+str(self.stage)), exist_ok=True)
                 cv2.imwrite(os.path.join(self.result_dir, self.dataset, self.folder, 'img'+str(self.stage), 'A2B_%07d.png' % step), A2B * 255.0)
                 self.genA2B.train(), self.genB2A.train(), self.disGA.train(), self.disGB.train(), self.disLA.train(), self.disLB.train()
 
@@ -423,6 +424,8 @@ class CBFNet(object) :
                 torch.save(params, os.path.join(self.result_dir, self.dataset, self.folder + '_params_latest.pt'))
 
     def save(self, dir, step):
+        if not os.path.exists(dir):
+            os.makedirs(dir)
         params = {}
         params['genA2B'] = self.genA2B.state_dict()
         params['genB2A'] = self.genB2A.state_dict()
@@ -443,9 +446,9 @@ class CBFNet(object) :
 
     def val(self):
         list_model = sorted(
-            glob(os.path.join(self.result_dir, self.dataset, self.folder, 'model' + str(self.stage), '*' + '.pt')))
+            glob(os.path.join(self.result_dir, self.dataset, self.folder, 'model' + str(self.stage), '*' + '00.pt'))) # get the model list each 100.
         max_value = [0, 0, 0, 0, 0]
-        for m in list_model:
+        for m in list_model[-5:]:
             model_list = glob(
                 os.path.join(self.result_dir, self.dataset, self.folder, 'model' + str(self.stage),
                              str(m.split('/')[-1].split('\'')[0])))
@@ -502,6 +505,8 @@ class CBFNet(object) :
                 MASKA2B_r = RGB2BGR(tensor2numpy(denorm(att_maskA2B_r[0])) * 2 - 1)
                 if (self.dataset == "ISIC"):
                     pathA = pathA.split('.')[0]
+                elif (self.dataset == "OSIC"):
+                    pathA = pathA.split('.')[0] #remove '.png'
                 cv2.imwrite(os.path.join(path1, pathA + '_a2_b.png'), MASKA2B_r * 255.0)
 
                 att_maskA2B = att_maskA2B

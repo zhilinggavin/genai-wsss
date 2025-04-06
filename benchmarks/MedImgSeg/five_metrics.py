@@ -53,6 +53,8 @@ def five_m(model_name, pre_path, label_path, dataset, folder, stage):
         index = filename.rfind(".")
         label_name = filename[:index] + ".png"
         target_path = os.path.join(label_path, label_name)
+        if not os.path.exists(target_path):
+            target_path = target_path.replace("_segmentation.png", "_mask.png")
         target = cv2.imread(target_path)
 
         iou,JA,AC,DI,SE,SP = iou_score(pre/255, target/255)

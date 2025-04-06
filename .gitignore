@@ -8,6 +8,7 @@ experiments/*/logs/
 experiments/**/pred_mask/
 src/Pytorch_UNet/
 benchmarks/MedImgSeg/dataset/
+benchmarks/MedImgSeg/results/
 
 # keep the following directories
 !data/*/processed_quant/
