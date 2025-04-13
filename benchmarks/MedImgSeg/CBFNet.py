@@ -446,7 +446,9 @@ class CBFNet(object) :
 
     def val(self):
         list_model = sorted(
-            glob(os.path.join(self.result_dir, self.dataset, self.folder, 'model' + str(self.stage), '*' + '00.pt'))) # get the model list each 100.
+            glob(os.path.join(self.result_dir, self.dataset, self.folder, 'model' + str(self.stage), '*' + '000.pt'))) # get the model list each 1000.
+        if len(list_model) == 0:
+            list_model = sorted(glob(os.path.join(self.result_dir, self.dataset, self.folder, 'model' + str(self.stage), '*' + '.pt')))
         max_value = [0, 0, 0, 0, 0]
         for m in list_model[-5:]:
             model_list = glob(

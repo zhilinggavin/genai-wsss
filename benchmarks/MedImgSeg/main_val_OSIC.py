@@ -99,7 +99,12 @@ def main():
     args.resume = False
     args.phase = 'val'
     
-    
+    # debug orig pre-trained model
+    args.dataset = 'BraTS'
+    args.folder = 'brats_1'
+    import yaml
+    with open('args.yaml', 'w') as file:
+        yaml.dump(args, file, default_flow_style=False)
     
     if args is None:
       exit()

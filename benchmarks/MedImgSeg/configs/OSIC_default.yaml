@@ -1,0 +1,27 @@
+!!python/object:argparse.Namespace
+phase: "val"                # [train / test / val]
+light: True                  # [CBFNet full version / CBFNet light version]
+dataset: "OSIC"               # Dataset name BraTS
+folder: ""                    # Folder name
+iteration: 7000               # Number of training iterations
+batch_size: 1                 # Batch size
+print_freq: 50                # Frequency of printing images
+save_freq: 50                 # Frequency of saving models
+decay_flag: false             # Whether to use learning rate decay
+lr: 0.0001                    # Learning rate
+weight_decay: 0.00002         # Weight decay
+adv_weight: 1                 # Weight for GAN
+cycle_weight: 10              # Weight for Cycle
+identity_weight: 10           # Weight for Identity
+cam_weight: 1000              # Weight for CAM
+recon_weight: 10              # Weight for reconstruction
+ch: 54                        # Base channel number per layer
+n_res: 4                      # Number of ResNet blocks
+n_dis: 6                      # Number of discriminator layers
+img_size: 256                 # Image size
+img_ch: 3                     # Number of image channels
+result_dir: "results"         # Directory to save results
+device: "cuda"                # Device to use [cpu / cuda]
+benchmark_flag: false         # Enable benchmark mode
+resume: false                 # Resume training from checkpoint
+stage: 1                      # Stage of training

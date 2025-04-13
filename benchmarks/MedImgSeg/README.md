@@ -91,3 +91,18 @@ your_project_location
 
 ## The original reference paper is AttentionGAN
 code: `https://github.com/Ha0Tang/AttentionGAN`, generating attention mask
+
+## Generating and manipulation process
+```
+class ResnetGenerator(nn.Module):
+  def forward(self, input):
+      ... ...
+        image_out1 = self.Decode_image(x_decoder)
+        input_r = self.Decode_recon(x_r)
+
+        out_mask = self.Decode_mask(att_mask[:, 0:1, :, :])
+        out_mask = out_mask.repeat(1, 3, 1, 1)
+        image_out2 = image_out1*out_mask + input*(self.background_image-out_mask)
+# AdaLIN three branches
+
+      return image_out1, cam_logit, heatmap, out_mask, image_out2, input_r
