@@ -191,7 +191,7 @@ def findCont(model_name, path, output_path):
         # if result[2, 2] == 255:
         #     result = 255-result
         # filename = filename[:-5]+'_segmentation'
-        filename = filename[:-5]+'_mask' #change postfix
+        filename = filename[:-5]+'_mask' #change suffix
 
         cv2.imwrite(output_path + '/' + filename+".png", result)
         print(round(count * 100 / len(path_list), 2), "%")

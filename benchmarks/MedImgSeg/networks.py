@@ -243,7 +243,7 @@ class ResnetGenerator(nn.Module):
                 input_r = self.Decode_recon(x_r)
 
                 out_mask = self.Decode_mask(att_mask[:, 0:1, :, :])
-                out_mask = out_mask.repeat(1, 3, 1, 1)
+                out_mask = out_mask.repeat(1, 3, 1, 1) # Soft Mask
                 image_out2 = image_out1*out_mask + input*(self.background_image-out_mask)
 # AdaLIN三个分支
 

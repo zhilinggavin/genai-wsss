@@ -42,12 +42,12 @@ def str2bool(x):
     return x.lower() in ('true')
 
 def cam(x, size = 256):
-    x = x - np.min(x)
-    cam_img = x / np.max(x)
+    x = x - np.min(x) # Normalize x to start from 0
+    cam_img = x / np.max(x) # Normalize x to the range [0, 1]
     cam_img = np.uint8(255 * cam_img)
     cam_img = cv2.resize(cam_img, (size, size))
-    cam_img = cv2.applyColorMap(cam_img, cv2.COLORMAP_JET)
-    return cam_img / 255.0
+    cam_img = cv2.applyColorMap(cam_img, cv2.COLORMAP_JET) # Apply a heatmap color map
+    return cam_img / 255.0 # Normalize the heatmap to [0, 1]
 
 def imagenet_norm(x):
     mean = [0.485, 0.456, 0.406]

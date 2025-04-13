@@ -106,3 +106,12 @@ class ResnetGenerator(nn.Module):
 # AdaLIN three branches
 
       return image_out1, cam_logit, heatmap, out_mask, image_out2, input_r
+```
+
+The returned `out_mask` is soft masks (continious mask)
+
+- Soft Attention:
+In many attention-based models, soft masks are preferred because they allow the network to assign varying degrees of importance to different regions, rather than making hard decisions.
+
+- `image_out1` is the direct output of the decoder, representing the generated image.
+- `image_out2` is a blended image that **combines image_out1 and the original** input image using the soft mask `out_mask`. This allows for selective modification of certain regions while preserving others.
