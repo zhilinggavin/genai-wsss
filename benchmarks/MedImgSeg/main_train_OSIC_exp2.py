@@ -110,6 +110,7 @@ def main():
     args.recon_weight = 10
     args.phase = 'train'
     args.print_freq = 100 #50
+    args.save_freq = args.print_freq #50
     args.exp_name = 'less_equal_trainA'
     
     

@@ -415,8 +415,8 @@ class CBFNet(object) :
                                                                RGB2BGR(tensor2numpy(denorm(att_maskA2B[0]))*2-1)), 0))
                                                                , 1)
 
-                os.makedirs(os.path.join(self.result_dir, self.dataset, self.folder, 'img'+str(self.stage)), exist_ok=True)
-                cv2.imwrite(os.path.join(self.result_dir, self.dataset, self.folder, 'img'+str(self.stage), 'A2B_%07d.png' % step), A2B * 255.0)
+                os.makedirs(os.path.join(self.result_dir, self.dataset, self.folder, 'img_'+self.exp_name), exist_ok=True)
+                cv2.imwrite(os.path.join(self.result_dir, self.dataset, self.folder, 'img_'+self.exp_name, 'A2B_%07d.png' % step), A2B * 255.0)
                 self.genA2B.train(), self.genB2A.train(), self.disGA.train(), self.disGB.train(), self.disLA.train(), self.disLB.train()
 
             if step % self.save_freq == 0:
