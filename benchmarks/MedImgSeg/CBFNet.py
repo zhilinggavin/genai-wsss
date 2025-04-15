@@ -59,6 +59,7 @@ class CBFNet(object) :
         self.imglist_testB = os.listdir(os.path.join('dataset', self.dataset, self.folder, 'testB'))
         self.batch_size = args.batch_size
         self.stage = args.stage
+        self.exp_name = args.exp_name
 
         if torch.backends.cudnn.enabled and self.benchmark_flag:
             print('set benchmark !')
@@ -165,11 +166,11 @@ class CBFNet(object) :
 
         start_iter = 1
         if self.resume:
-            model_list = glob(os.path.join(self.result_dir, self.dataset, self.folder, 'model'+str(self.stage), '*.pt'))
+            model_list = glob(os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name, '*.pt'))
             if not len(model_list) == 0:
                 model_list.sort()
                 start_iter = int(model_list[-1].split('_')[-1].split('.')[0])
-                self.load(os.path.join(self.result_dir, self.dataset, self.folder, 'model'+str(self.stage)), start_iter)
+                self.load(os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name), start_iter)
                 print(" [*] Load SUCCESS")
                 if self.decay_flag and start_iter > (self.iteration // 2):
                     self.G_optim.param_groups[0]['lr'] -= (self.lr / (self.iteration // 2)) * (start_iter - self.iteration // 2)
@@ -419,7 +420,8 @@ class CBFNet(object) :
                 self.genA2B.train(), self.genB2A.train(), self.disGA.train(), self.disGB.train(), self.disLA.train(), self.disLB.train()
 
             if step % self.save_freq == 0:
-                self.save(os.path.join(self.result_dir, self.dataset, self.folder, 'model'+str(self.stage)), step)
+                # self.save(os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name), step)
+                self.save(os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name), step)
 
             if step % 1000 == 0:
                 params = {}
@@ -454,19 +456,20 @@ class CBFNet(object) :
 
     def val(self):
         list_model = sorted(
-            glob(os.path.join(self.result_dir, self.dataset, self.folder, 'model' + str(self.stage), '*' + '000.pt'))) # get the model list each 1000.
+            # glob(os.path.join(self.result_dir, self.dataset, self.folder, 'model' + str(self.stage), '*' + '000.pt'))) # get the model list each 1000.
+            glob(os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name, '*' + '000.pt'))) # get the model list each 1000.
         if len(list_model) == 0:
-            list_model = sorted(glob(os.path.join(self.result_dir, self.dataset, self.folder, 'model' + str(self.stage), '*' + '.pt')))
+            list_model = sorted(glob(os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name, '*' + '.pt')))
         max_value = [0, 0, 0, 0, 0]
         for m in list_model[-5:]:
             model_list = glob(
-                os.path.join(self.result_dir, self.dataset, self.folder, 'model' + str(self.stage),
+                os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name,
                              str(m.split('/')[-1].split('\'')[0])))
             model_name = str(m.split('/')[-1].split('\'')[0])
             if not len(model_list) == 0:
                 model_list.sort()
                 iter = int(model_list[-1].split('_')[-1].split('.')[0])
-                self.load(os.path.join(self.result_dir, self.dataset, self.folder, 'model' + str(self.stage)), iter)
+                self.load(os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name), iter)
                 print(" [*] Load SUCCESS")
             else:
                 print(" [*] Load FAILURE")
@@ -555,16 +558,16 @@ class CBFNet(object) :
 
         print(" All Val finished!")
     def test(self):
-        list_model = sorted(glob(os.path.join(self.result_dir, self.dataset, self.folder, 'model'+str(self.stage), '*' + '.pt')))
+        list_model = sorted(glob(os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name, '*' + '.pt')))
         max_value = [0, 0, 0, 0, 0]
         for m in list_model:
             model_list = glob(
-                os.path.join(self.result_dir, self.dataset, self.folder, 'model'+str(self.stage), str(m.split('/')[-1].split('\'')[0])))
+                os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name, str(m.split('/')[-1].split('\'')[0])))
             model_name = str(m.split('/')[-1].split('\'')[0])
             if not len(model_list) == 0:
                 model_list.sort()
                 iter = int(model_list[-1].split('_')[-1].split('.')[0])
-                self.load(os.path.join(self.result_dir, self.dataset, self.folder, 'model'+str(self.stage)), iter)
+                self.load(os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name), iter)
                 print(" [*] Load SUCCESS")
             else:
                 print(" [*] Load FAILURE")
@@ -700,16 +703,16 @@ class CBFNet(object) :
         print(" All Test finished!")
 
     def pseud_mask(self):
-        list_model = sorted(glob(os.path.join(self.result_dir, self.dataset, self.folder, 'model'+str(self.stage), '*' + '.pt')))
+        list_model = sorted(glob(os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name, '*' + '.pt')))
         max_value = [0, 0, 0, 0, 0]
         for m in list_model:
             model_list = glob(
-                os.path.join(self.result_dir, self.dataset, self.folder, 'model'+str(self.stage), str(m.split('/')[-1].split('\'')[0])))
+                os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name, str(m.split('/')[-1].split('\'')[0])))
             model_name = str(m.split('/')[-1].split('\'')[0])
             if not len(model_list) == 0:
                 model_list.sort()
                 iter = int(model_list[-1].split('_')[-1].split('.')[0])
-                self.load(os.path.join(self.result_dir, self.dataset, self.folder, 'model'+str(self.stage)), iter)
+                self.load(os.path.join(self.result_dir, self.dataset, self.folder, self.exp_name), iter)
                 print(" [*] Load SUCCESS")
             else:
                 print(" [*] Load FAILURE")

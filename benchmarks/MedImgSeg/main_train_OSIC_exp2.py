@@ -3,6 +3,10 @@ import argparse
 from utils import *
 import cv2
 from libsvm import svmutil
+from dataset import ImageFolder
+from torch.utils.data import DataLoader
+from torchvision import transforms
+import os
 """parsing and configuration"""
 
 
@@ -89,7 +93,7 @@ def check_args(args):
 def main():
     # parse arguments
     args = parse_args()
-    
+    args.exp_name = 'model1' # mimic default result folder 'model1'
     # Custom debugging:
     #quickly test on BraTS dataset
     # python -u main.py --light True --dataset BraTS --folder brats_1 --resume False --iteration 7000 --lr 0.0001 --adv_weight 1 --cycle_weight 10 --identity_weight 10 --cam_weight 1000 --recon_weight 10 --phase train
@@ -105,7 +109,8 @@ def main():
     args.cam_weight = 1000
     args.recon_weight = 10
     args.phase = 'train'
-    args.print_freq = 1000 #50
+    args.print_freq = 100 #50
+    args.exp_name = 'less_equal_trainA'
     
     
     if args is None:
@@ -117,6 +122,20 @@ def main():
 
     # build graph
     gan.build_model()
+    
+    def set_trainloader(self):
+
+        # self.trainA.imgs = self.trainA.imgs[:len(self.trainB)]
+        chunk_size = len(self.trainA) // len(self.trainB)
+        self.trainA.samples = [self.trainA.samples[i] for i in range(0, len(self.trainA.samples), chunk_size)]
+
+
+
+        self.trainA_loader = DataLoader(self.trainA, batch_size=self.batch_size, shuffle=True)
+        self.trainB_loader = DataLoader(self.trainB, batch_size=self.batch_size, shuffle=True)
+        
+        return self.trainA_loader, self.trainB_loader
+    gan.trainA_loader, gan.trainB_loader = set_trainloader(gan)
 
     if args.phase == 'train':
         gan.train()

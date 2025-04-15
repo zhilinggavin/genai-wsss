@@ -112,6 +112,7 @@ class ImageFolder(DatasetFolder):
                 testset = [line.strip() for line in testset]  # Remove newline characters
             
             self.imgs = [x for x in self.samples if os.path.basename(x[0]) not in testset] # trainset
+            self.samples = self.imgs
         else:
             self.imgs = self.samples
             
