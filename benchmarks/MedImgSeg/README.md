@@ -115,3 +115,8 @@ In many attention-based models, soft masks are preferred because they allow the 
 
 - `image_out1` is the direct output of the decoder, representing the generated image.
 - `image_out2` is a blended image that **combines image_out1 and the original** input image using the soft mask `out_mask`. This allows for selective modification of certain regions while preserving others.
+
+## CAM Branch
+The code uses both `GAP` and `GMP` to compute `CAM`, which is a variation of the standard CAM technique.
+The `heatmap` is the visual representation of the class activation, showing which parts of the input are important for the prediction.
+The `cam_logit` contains the class scores derived from the GAP and GMP features. 
