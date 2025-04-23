@@ -513,6 +513,9 @@ class CBFNet(object) :
 
                 background = torch.zeros_like(att_maskA2B).to(self.device)
                 att_maskA2B = torch.where(real_A2 > -1, att_maskA2B, background)
+                
+                if (self.dataset == "OSIC"):
+                    att_maskA2B = norm_01(att_maskA2B ** 5)
 
                 att_maskA2B_r = 1 - att_maskA2B
                 MASKA2B_r = RGB2BGR(tensor2numpy(denorm(att_maskA2B_r[0])) * 2 - 1)

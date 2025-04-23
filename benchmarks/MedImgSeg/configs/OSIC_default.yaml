@@ -25,3 +25,4 @@ device: "cuda"                # Device to use [cpu / cuda]
 benchmark_flag: false         # Enable benchmark mode
 resume: false                 # Resume training from checkpoint
 stage: 1                      # Stage of training
+exp_name: 'model1'

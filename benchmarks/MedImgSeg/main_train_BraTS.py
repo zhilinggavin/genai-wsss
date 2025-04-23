@@ -96,8 +96,8 @@ def main():
     args.light = True
     args.dataset = 'BraTS'
     args.folder = 'brats_1'
-    args.resume = False #False, True
-    args.iteration = 7000 #100 #7000
+    args.resume = True #False, True
+    args.iteration = 14000 #100 #7000
     args.lr = 0.0001
     args.adv_weight = 1
     args.cycle_weight = 10
@@ -105,7 +105,9 @@ def main():
     args.cam_weight = 1000
     args.recon_weight = 10
     args.phase = 'train'
-    args.print_freq = 100 #50
+    args.print_freq = 200 #50
+    args.save_freq = args.print_freq #50
+    args.exp_name = 'model1'
     
     
     if args is None:

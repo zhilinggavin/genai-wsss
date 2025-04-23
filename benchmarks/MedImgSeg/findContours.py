@@ -7,7 +7,10 @@ import cv2
 import math
 
 def water(img_path):
-    src = cv2.imread(img_path)
+    try:
+        src = cv2.imread(img_path)
+    except:
+        src = img_path #directly input image
     img = src.copy()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     ret, thresh = cv2.threshold(
@@ -158,7 +161,10 @@ def findCont(model_name, path, output_path):
         len1 += 1
         image_path = os.path.join(path, filename)
         src = cv2.imread(image_path)
-        result = water(image_path)
+        if any('OSIC' in item for item in (model_name, path, output_path)):
+            result = water_osic(image_path)
+        else:
+            result = water(image_path)
         # result = segmentation(image_path)
 
         # contours, hierarchy = cv2.findContours(result, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -198,3 +204,53 @@ def findCont(model_name, path, output_path):
         #cv2.imwrite(r'C:\Users\SY\Desktop\results\pair/' + filename + ".png", src)
         #进度：
         #print(len1 * 100 / len(path_list), "%")
+        
+def water_osic(img_path):
+    try:
+        src = cv2.imread(img_path)
+    except:
+        src = img_path #directly input image
+    img = src.copy()
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    ret, thresh = cv2.threshold(
+        gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+    # 消除噪声
+    kernel = np.ones((3, 3), np.uint8)
+    opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
+
+    # 膨胀
+    kernel2 = np.ones((7, 7), np.uint8)
+    sure_bg = cv2.dilate(opening, kernel2, iterations=3)
+
+    # 距离变换
+    dist_transform = cv2.distanceTransform(sure_bg, 1, 5)
+    ret, sure_fg = cv2.threshold(dist_transform, 0.7 * dist_transform.max(), 255, 0)
+
+    # 获得未知区域
+    sure_fg = np.uint8(sure_fg)
+    unknown = cv2.subtract(sure_bg, sure_fg)
+
+    # 标记
+    ret, markers1 = cv2.connectedComponents(sure_fg)
+
+    # 确保背景是1不是0
+    markers = markers1 + 1
+
+    # 未知区域标记为0
+    markers[unknown == 255] = 0
+
+    markers3 = cv2.watershed(img, markers)
+    # -1是分割线
+    img[markers3 == -1] = [0, 0, 0]
+    #1是背景
+    img[markers3 == 1] = [0, 0, 0]
+    #234是前景
+    img[markers3 == 2] = [255, 255, 255]
+    img[markers3 == 3] = [255, 255, 255]
+    img[markers3 == 4] = [255, 255, 255]
+    
+    img[markers3>4] = [255, 255, 255]
+    
+    img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel, iterations=1)
+    return img

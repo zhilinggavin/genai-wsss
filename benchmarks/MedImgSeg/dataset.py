@@ -105,7 +105,7 @@ class ImageFolder(DatasetFolder):
         super(ImageFolder, self).__init__(root, loader, IMG_EXTENSIONS,
                                           transform=transform,
                                           target_transform=target_transform)
-        if 'OSIC' in root:
+        if 'OSIC' and 'train' in root:
             test_split_path = '/media/NAS06/gavinyue/genai-wsss/data/OSIC/split/splits_orig_name/test.txt'
             with open(test_split_path, 'r') as file:
                 testset = file.readlines()  # Reads all testset into a list

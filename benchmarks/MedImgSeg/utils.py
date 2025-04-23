@@ -64,3 +64,9 @@ def tensor2numpy(x):
 
 def RGB2BGR(x):
     return cv2.cvtColor(x, cv2.COLOR_RGB2BGR)
+
+def norm_01(array: float):
+    if array.max() - array.min() < 0.9:
+        return (array - array.min()) / (array.max() - array.min())
+    else:
+        return array
