@@ -121,9 +121,12 @@ class CBFNet(object) :
         elif(self.dataset=="OSIC"):
             dataset_A = "fibrosis"
             dataset_B = "no_fibrosis"
+            dataset_A_gt = "fibrosis_gt"
         else:
             print("dataset name is wrong")
             sys.exit(1)
+        self.fibrosis_path = os.path.join('dataset', self.dataset, self.folder, dataset_A)
+        self.gt_path = os.path.join('dataset', self.dataset, self.folder, dataset_A_gt)
         self.trainA = ImageFolder(os.path.join('dataset', self.dataset, self.folder, dataset_A), train_transform)
         self.trainB = ImageFolder(os.path.join('dataset', self.dataset, self.folder, dataset_B), train_transform)
         self.testA = ImageFolder(os.path.join('dataset', self.dataset, self.folder, 'testA', 'images'), test_transform)

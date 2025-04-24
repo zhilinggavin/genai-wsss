@@ -1,6 +1,7 @@
 import torch.utils.data as data
 
 from PIL import Image
+import numpy as np
 
 import os
 import os.path
@@ -64,6 +65,10 @@ class DatasetFolder(data.Dataset):
         """
         path, target = self.samples[index]
         sample = self.loader(path)
+        try:
+            target = np.array(Image.open(target))
+        except:
+            pass
         if self.transform is not None:
             sample = self.transform(sample)
         if self.target_transform is not None:
@@ -105,6 +110,8 @@ class ImageFolder(DatasetFolder):
         super(ImageFolder, self).__init__(root, loader, IMG_EXTENSIONS,
                                           transform=transform,
                                           target_transform=target_transform)
+        fibrosis_path = 'dataset/OSIC/fibrosis'
+        gt_path = 'dataset/OSIC/fibrosis_gt'
         if 'OSIC' and 'train' in root:
             test_split_path = '/media/NAS06/gavinyue/genai-wsss/data/OSIC/split/splits_orig_name/test.txt'
             with open(test_split_path, 'r') as file:
@@ -113,6 +120,14 @@ class ImageFolder(DatasetFolder):
             
             self.imgs = [x for x in self.samples if os.path.basename(x[0]) not in testset] # trainset
             self.samples = self.imgs
+        if 'OSIC' and 'testA' in root:
+            test_split_path = '/media/NAS06/gavinyue/genai-wsss/data/OSIC/split/splits_orig_name/test.txt'
+            with open(test_split_path, 'r') as file:
+                testset = file.readlines()
+                testset = [line.strip() for line in testset]
+            self.imgs = [[os.path.join(fibrosis_path, x),os.path.join(gt_path, x.replace('.png','_mask.png'))] for x in testset]
+            self.samples = self.imgs
+
         else:
             self.imgs = self.samples
             

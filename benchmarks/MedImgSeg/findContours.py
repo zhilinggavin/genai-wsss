@@ -250,7 +250,8 @@ def water_osic(img_path):
     img[markers3 == 3] = [255, 255, 255]
     img[markers3 == 4] = [255, 255, 255]
     
-    img[markers3>4] = [255, 255, 255]
+    # img[markers3>4] = [255, 255, 255]
+    img[markers3>4] = [0, 0, 0]
     
     img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel, iterations=1)
     return img
