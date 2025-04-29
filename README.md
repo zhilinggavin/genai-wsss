@@ -38,6 +38,11 @@ The processed images will be resized to 256x256 and saved in the directory:
     data/OSIC/processed/fibrosis
 ```
 
+**Raw Preprocess and Location**
+Original preprocessing file: `preprocess_OSIC.py`   
+Modified from orginal: `preprocess_COVID.py`, `preprocess_YYF30Case.py`
+- windowing: `min_value=-1024, max_value=-100`
+
 **GT Process and Location**  
 The original fibrosis label is an annotation, which is converted to a segmentation mask through processing.
 - **`fibrosis_gt`**:  

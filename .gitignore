@@ -7,6 +7,7 @@ __pycache__/
 data/*/raw/
 data/*/*processed*/
 data/*/3d_visual/
+data/YYF_30Case/raw/
 experiments/*/checkpoints/
 experiments/*/logs/
 experiments/**/pred_mask/
