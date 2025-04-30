@@ -62,7 +62,7 @@ if __name__ == "__main__":
     root_dir = "../data/YYF_30Case" # Replace with your folder path
     img_path = os.path.join(root_dir, "raw")
     assert os.path.exists(root_dir), f"Error: The directory '{root_dir}' does not exist."
-    assert os.path.exists(img_path), f"Error: The directory '{root_dir}' does not exist."
+    assert os.path.exists(img_path), f"Error: The directory '{img_path}' does not exist."
 
     '''
     Load all annotated cts
