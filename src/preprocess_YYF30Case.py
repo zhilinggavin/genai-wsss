@@ -1,4 +1,3 @@
-import cv2
 import numpy as np
 import copy
 import cv2
@@ -6,11 +5,13 @@ import os
 import matplotlib.pyplot as plt
 import random
 # from utils.train import setup_seed
-import os, glob, json
+import os, glob
 import SimpleITK as sitk
-import sys
 from lungmask import mask
 from tqdm import tqdm
+from pathlib import Path
+from torchvision.transforms import functional as trans_fn
+from PIL import Image
 
 
 def bbox_3D(img):
@@ -26,6 +27,7 @@ def bbox_3D(img):
     return [rmin, rmax, cmin, cmax, zmin, zmax]
 
 def extract_number(filename):
+    # exact the numerical numvers from the left
     import re
     match = re.search(r'\d+', filename)
     return int(match.group()) if match else None
@@ -51,52 +53,53 @@ def image_3D_normalisation(npImage, min_value=-1024, max_value=-100):
     return npImage_norm
 
 if __name__ == "__main__":
-    # Specify the root directory for the raw files - DCM files
-    root_directory = "../data/YYF_30Case/raw"  # Replace with your folder path
-    assert os.path.exists(root_directory), f"Error: The directory '{root_directory}' does not exist."
+    IMAGE_SIZE = [256, 256]
+    anno_label = False
+    # Specify the root directory
+    root_dir = "../data/YYF_30Case" # Replace with your folder path
+    img_path = os.path.join(root_dir, "raw")
+    assert os.path.exists(root_dir), f"Error: The directory '{root_dir}' does not exist."
+    assert os.path.exists(img_path), f"Error: The directory '{root_dir}' does not exist."
 
     '''
     Load all annotated cts
     '''
-    # cts = os.listdir()
-    # fibrosis
-
-    path = '/media/NAS04/yyfang/prognostic_result/dataset/data_fibrosis/gavin/fibrosis_annotation/'
-    files = os.listdir(path)
-    # Sort the files based on their numeric value
+    # path = '/media/NAS04/yyfang/prognostic_result/dataset/data_fibrosis/gavin/fibrosis_annotation/'
+    files = os.listdir(img_path)
+    # Sort the files based on their left numeric value
+    files = [file for file in files if file.endswith('.nii.gz')]
     files = sorted(files, key=extract_number)
 
-
-    pattern = '_fibrosis.nii.gz'
-    fibrosis = [file for file in files if file.endswith(pattern)]
-    original = [file for file in files if 'fibrosis' not in file]
-    print(f"Total annotated files: {len(fibrosis)} \nTotal original files: {len(original)}")
+    if anno_label:
+        anno_suffix = '_fibrosis.nii.gz'
+        annos = [file for file in files if file.endswith(anno_suffix)]
+        cts = [file for file in files if not file.endswith(anno_suffix)]
+        print(f"Total annotated files: {len(annos)} \nTotal CT files: {len(cts)}")
+    else:
+        cts = files
+        print(f"No annotated files;\nTotal CT files: {len(cts)}")
+    
+    '''
+    The Anno file preprocss function is disabled in this file. To be corrected.
+    '''
 
     count = 0
-    for ct_fibrosis in tqdm(fibrosis):
-        print(f'count: {count}, ct_fibrosis: {ct_fibrosis}')
+    for ct_name in tqdm(cts):
+        print(f'count: {count}, ct_name: {ct_name}')
         count += 1
 
-        ct_512_orig = os.path.join(path, ct_fibrosis.replace('_fibrosis', ''))
-        ct_512_fibrosis = os.path.join(path, ct_fibrosis)
+        ct_512_orig = os.path.join(img_path, ct_name)
+        # ct_512_fibrosis = os.path.join(path, ct_name)
         
-
-        # ct_512_orig_np = sitk.GetArrayFromImage(path + ct_512_orig)
-        # ct_512_masked = path + ct_fibrosis
-
-        # ct_350_orig = datapath_350_3D + ct
-        # ct_350_mask = datapath_350_mask + ct
-        # ct_350_masked = savepath_350_masked + ct
-
         try:
-            ct_512_orig_stik = sitk.ReadImage(ct_512_orig)
-            ct_512_fibrosis_stik = sitk.ReadImage(ct_512_fibrosis)
+            ct_512_orig_stik = sitk.ReadImage(ct_512_orig) #shape (slices, 512, 512)
+            # ct_512_fibrosis_stik = sitk.ReadImage(ct_512_fibrosis)
         except:
-            print("failed!")
+            print("CT file read failed!")
             continue
 
         ct_512_orig_np = sitk.GetArrayFromImage(ct_512_orig_stik)
-        ct_512_fibrosis_np = sitk.GetArrayFromImage(ct_512_fibrosis_stik)
+        # ct_512_fibrosis_np = sitk.GetArrayFromImage(ct_512_fibrosis_stik)
 
 
         ct_512_mask_np = mask.apply(ct_512_orig_np) #to perform lung segmentation
@@ -107,73 +110,55 @@ if __name__ == "__main__":
             try:
                 rmin, rmax, cmin, cmax, zmin, zmax = bbox_3D(ct_512_mask_binary_np)
             except:
-                print("{}: crop failure".format(ct_fibrosis))
+                print("{}: crop failure".format(ct_name))
                 continue
         ct_box_orig = ct_512_orig_np[rmin:rmax, cmin:cmax, zmin:zmax]
         ct_box_mask = ct_512_mask_np[rmin:rmax, cmin:cmax, zmin:zmax]
         ct_box_mask_binary = ct_512_mask_binary_np[rmin:rmax, cmin:cmax, zmin:zmax]
-        ct_box_fibrosis = ct_512_fibrosis_np[rmin:rmax, cmin:cmax, zmin:zmax]
+        # ct_box_fibrosis = ct_512_fibrosis_np[rmin:rmax, cmin:cmax, zmin:zmax]
 
         # resample
         z_size = ct_box_orig.shape[0]
-        ct_350_orig = np.zeros([z_size, 350, 350])
-        ct_350_mask = np.zeros([z_size, 350, 350])
-        ct_350_mask_binary = np.zeros([z_size, 350, 350])
-        ct_350_fibrosis = np.zeros([z_size, 350, 350])
+        ct_350_orig = np.zeros([z_size, *IMAGE_SIZE])
+        ct_350_mask = np.zeros([z_size, *IMAGE_SIZE])
+        ct_350_mask_binary = np.zeros([z_size, *IMAGE_SIZE])
+        # ct_350_fibrosis = np.zeros([z_size, 350, 350])
         for z in range(z_size):
-            ct_350_orig[z, :, :] = cv2.resize(ct_box_orig[z, :, :], [350, 350], interpolation=cv2.INTER_AREA)
-            ct_350_mask[z, :, :] = cv2.resize(ct_box_mask[z, :, :], [350, 350], interpolation=cv2.INTER_NEAREST)
-            ct_350_mask_binary[z, :, :] = cv2.resize(ct_box_mask_binary[z, :, :], [350, 350], interpolation=cv2.INTER_NEAREST)
-            ct_350_fibrosis[z, :, :] = cv2.resize(ct_box_fibrosis[z, :, :], [350, 350], interpolation=cv2.INTER_NEAREST)
+            # ct_350_orig[z, :, :] = cv2.resize(ct_box_orig[z, :, :], [256, 256], interpolation=cv2.INTER_AREA)
+            # ct_350_mask[z, :, :] = cv2.resize(ct_box_mask[z, :, :], [350, 350], interpolation=cv2.INTER_NEAREST)
+            # ct_350_mask_binary[z, :, :] = cv2.resize(ct_box_mask_binary[z, :, :], [350, 350], interpolation=cv2.INTER_NEAREST)
+            # # ct_350_fibrosis[z, :, :] = cv2.resize(ct_box_fibrosis[z, :, :], [350, 350], interpolation=cv2.INTER_NEAREST)
+            
+            # Resize slices using LANCZOS for continuous data and NEAREST for masks; DO not use CV2
+            ct_350_orig[z, :, :] = np.array(trans_fn.resize(
+                Image.fromarray(ct_box_orig[z, :, :]), IMAGE_SIZE, interpolation=trans_fn.InterpolationMode.LANCZOS
+            ))
+            # ct_350_mask[z, :, :] = np.array(trans_fn.resize(
+            #     Image.fromarray(ct_box_mask[z, :, :]), IMAGE_SIZE, interpolation=trans_fn.InterpolationMode.LANCZOS
+            # ))
+            ct_350_mask_binary[z, :, :] = np.array(trans_fn.resize(
+                Image.fromarray(ct_box_mask_binary[z, :, :]), IMAGE_SIZE, interpolation=trans_fn.InterpolationMode.NEAREST
+            ))
 
 
-        ct_350_orig_stik = sitk.GetImageFromArray(ct_350_orig)
-        ct_350_mask_sitk = sitk.GetImageFromArray(ct_350_mask)
-        ct_350_mask_binary_stik = sitk.GetImageFromArray(ct_350_mask_binary)
-        ct_350_fibrosis_sitk = sitk.GetImageFromArray(ct_350_fibrosis)
-
-        # sitk.WriteImage(ct_350_orig_stik, save_image_path)
-        # sitk.WriteImage(ct_350_mask_sitk, save_image_segmentation_path)
-        # sitk.WriteImage(ct_350_mask_sitk, save_image_segmentation_path)
-        # ct_350_fibrosis_sitk
-
-
-        # selected slices, the first and last 20 slices will be excluded
-        for z in range(20,z_size-20): #for all slices, use range(ct_350_mask.shape[0])
+        # selected slices, the first and last 20 slices will be excluded range(20,z_size-20)
+        for z in range(ct_350_mask.shape[0]): #for all slices, use range(ct_350_mask.shape[0])
     
             slice = ct_350_orig[z, :, :]
-            slice_mask = ct_350_mask[z, :, :]
             slice_mask_binary = ct_350_mask_binary[z, :, :]
-            slice_fibrosis = ct_350_fibrosis[z, :, :]
-            num_fibrosis = sum(sum(slice_fibrosis))
-            slice_masked = image_3D_normalisation(slice) * slice_mask_binary
-            imgname = ct_fibrosis.replace('.nii.gz', '_'+str(z)+'.png')
-
-            save_folder = '/media/NAS04/yyfang/prognostic_result/dataset/data_fibrosis/gavin/slice_select/'
-            os.makedirs(os.path.join(save_folder, 'no_fibrosis_selected'), exist_ok=True)
-            os.makedirs(os.path.join(save_folder, 'fibrosis_selected'), exist_ok=True)
-            if num_fibrosis == 0:
-                tmp_save1 = os.path.join(save_folder, 'no_fibrosis_selected', imgname)
-                tmp_save2 = os.path.join(save_folder, 'no_fibrosis_selected', imgname.replace('.png', '_anno.png'))
+            # slice_fibrosis = ct_350_fibrosis[z, :, :]
+            num_anno = sum(sum(slice_fibrosis)) if anno_label else 0
+            slice_masked = image_3D_normalisation(slice) * slice_mask_binary #norm to 0-1
+            
+            imgname = ct_name.replace('.nii.gz', f'_{z:03d}.png')
+            save_folder = os.path.join(root_dir, "preprocessed_size256", ct_name.replace('.nii.gz',''))
+            os.makedirs(save_folder, exist_ok=True)
+            save_path = os.path.join(save_folder, imgname)
                 
-            else:
-                # continue
-                tmp_save1 = os.path.join(save_folder, 'fibrosis_selected', imgname)
-                tmp_save2 = os.path.join(save_folder, 'fibrosis_selected', imgname.replace('.png', '_anno.png'))
-
-                # #
-                # fig, ax = plt.subplots(1, 3, figsize=(30,10))
-                # ax[0].imshow(slice, cmap='gray')
-                # ax[0].set_title(f'slice({z})')
-                # ax[1].imshow(slice_masked, cmap='gray')
-                # ax[1].set_title(f'slice_masked')
-                # ax[2].imshow(slice_fibrosis, cmap='gray')
-                # ax[2].set_title(f'slice_fibrosis')
-                # plt.show()
-                # plt.savefig('tmp.png')
-                # print('saved')
-                # break
-            cv2.imwrite(tmp_save1, slice_masked * 255)
-            cv2.imwrite(tmp_save2, slice_fibrosis * 255) if num_fibrosis != 0 else None
+            slice_masked_img = Image.fromarray((slice_masked * 255).astype(np.uint8)).convert("RGB")
+            slice_masked_img.save(save_path)
+            
+            # img = Image.open(save_path)
+            # img_array = np.array(img)
             
         # break

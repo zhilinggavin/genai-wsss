@@ -42,6 +42,8 @@ The processed images will be resized to 256x256 and saved in the directory:
 Original preprocessing file: `preprocess_OSIC.py`   
 Modified from orginal: `preprocess_COVID.py`, `preprocess_YYF30Case.py`
 - windowing: `min_value=-1024, max_value=-100`
+- `preprocess_YYF30Case.py` will preprocess raw file, including masking, filtering lung slices, and finally resize to 256 using `LANCZOS`
+- old `preprocess_OSIC.py` only resize to 350 using cv2.INTER_AREA, not accurate and need futher preprocessing `data/OSIC/scripts/processing_fibrosis.py` to resize to 256
 
 **GT Process and Location**  
 The original fibrosis label is an annotation, which is converted to a segmentation mask through processing.
