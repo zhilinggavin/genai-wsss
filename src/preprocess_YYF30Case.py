@@ -19,7 +19,7 @@ def bbox_3D(img):
     r = np.any(img, axis=(1, 2))
     c = np.any(img, axis=(0, 2))
     z = np.any(img, axis=(0, 1))
-
+    # selects the first ([0]) and last ([-1]) elements from the array of indices
     rmin, rmax = np.where(r)[0][[0, -1]]
     cmin, cmax = np.where(c)[0][[0, -1]]
     zmin, zmax = np.where(z)[0][[0, -1]]
@@ -55,6 +55,9 @@ def image_3D_normalisation(npImage, min_value=-1024, max_value=-100):
 if __name__ == "__main__":
     IMAGE_SIZE = [256, 256]
     anno_label = False
+    perform_crop = True #True, False
+    GPU_ID = 1
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(GPU_ID)
     # Specify the root directory
     root_dir = "../data/YYF_30Case" # Replace with your folder path
     img_path = os.path.join(root_dir, "raw")
@@ -105,17 +108,20 @@ if __name__ == "__main__":
         ct_512_mask_np = mask.apply(ct_512_orig_np) #to perform lung segmentation
         ct_512_mask_binary_np = copy.deepcopy(ct_512_mask_np) #range[0,2],uint8, 512x512
         ct_512_mask_binary_np[ct_512_mask_binary_np != 0] = 1
-        perform_crop = True
+
         if perform_crop:
             try:
                 rmin, rmax, cmin, cmax, zmin, zmax = bbox_3D(ct_512_mask_binary_np)
             except:
                 print("{}: crop failure".format(ct_name))
                 continue
-        ct_box_orig = ct_512_orig_np[rmin:rmax, cmin:cmax, zmin:zmax]
-        ct_box_mask = ct_512_mask_np[rmin:rmax, cmin:cmax, zmin:zmax]
-        ct_box_mask_binary = ct_512_mask_binary_np[rmin:rmax, cmin:cmax, zmin:zmax]
-        # ct_box_fibrosis = ct_512_fibrosis_np[rmin:rmax, cmin:cmax, zmin:zmax]
+            ct_box_orig = ct_512_orig_np[rmin:rmax, cmin:cmax, zmin:zmax]
+            # ct_box_mask = ct_512_mask_np[rmin:rmax, cmin:cmax, zmin:zmax]
+            ct_box_mask_binary = ct_512_mask_binary_np[rmin:rmax, cmin:cmax, zmin:zmax]
+            # ct_box_fibrosis = ct_512_fibrosis_np[rmin:rmax, cmin:cmax, zmin:zmax]
+        else:
+            ct_box_orig = ct_512_orig_np
+            ct_box_mask_binary = ct_512_mask_binary_np
 
         # resample
         z_size = ct_box_orig.shape[0]
@@ -150,8 +156,10 @@ if __name__ == "__main__":
             num_anno = sum(sum(slice_fibrosis)) if anno_label else 0
             slice_masked = image_3D_normalisation(slice) * slice_mask_binary #norm to 0-1
             
-            imgname = ct_name.replace('.nii.gz', f'_{z:03d}.png')
-            save_folder = os.path.join(root_dir, "preprocessed_size256", ct_name.replace('.nii.gz',''))
+            # keep the original slice name and order
+            imgname = ct_name.replace('.nii.gz', f'_{z+rmin:03d}.png') if perform_crop else ct_name.replace('.nii.gz', f'_{z:03d}.png')
+            dir_name = "preprocessed_size256_cropped" if perform_crop else "preprocessed_size256"
+            save_folder = os.path.join(root_dir, dir_name, ct_name.replace('.nii.gz',''))
             os.makedirs(save_folder, exist_ok=True)
             save_path = os.path.join(save_folder, imgname)
                 

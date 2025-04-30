@@ -4,10 +4,10 @@
 # ignore the following directories
 __pycache__/
 .ipynb_checkpoints/
-data/*/raw/
-data/*/*processed*/
+data/*/raw
+data/*/*process*
 data/*/3d_visual/
-data/YYF_30Case/raw/
+data/YYF_30Case/labels*
 experiments/*/checkpoints/
 experiments/*/logs/
 experiments/**/pred_mask/
@@ -18,3 +18,4 @@ benchmarks/MedImgSeg/dataset/
 benchmarks/MedImgSeg/results/
 benchmarks/SEAM/models/
 benchmarks/MedImgSeg/models/
+
