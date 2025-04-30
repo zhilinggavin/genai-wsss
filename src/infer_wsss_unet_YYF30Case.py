@@ -177,7 +177,7 @@ def infer(model, data_loader, device, save_dir, csv_file_path=None):
         df.to_csv(csv_file_path, mode='a', header= not header_exists, index=False)
 
     # print(f'Case {case_name} done!')
-    print(f'Pred mask saved to {save_dir}')
+    print(f'\nPred mask saved to {save_dir}')
     print(f'Pixel number saved to {csv_file_path}')
 
 if __name__ == '__main__': 
@@ -187,8 +187,9 @@ if __name__ == '__main__':
     device = 'cuda'
     # full_supervised unet model
     model_path = '../experiments/wsss_unet/checkpoints/fold5_best_dice_epoch45.pth'
-    root_dir = '../data/YYF_30Case/preprocessed_size256_cropped'
-    save_base_dir = '../experiments/wsss_unet/results/YYF_30Case/preprocessed_size256_cropped'
+    root_dir = '../data/YYF_30Case/preprocessed_size256'
+    # root_dir = '../data/YYF_30Case/preprocessed_size256_cropped'
+    save_base_dir = os.path.join("../experiments/wsss_unet/results", root_dir.split('data/')[-1])
     model = model_loading(model_path, device)
     
     # data loading
