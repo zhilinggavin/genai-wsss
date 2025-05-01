@@ -7,7 +7,7 @@ __pycache__/
 data/*/raw
 data/*/*process*
 data/*/3d_visual/
-data/YYF_30Case/labels*
+data/YYF_30Case/label*
 experiments/*/checkpoints/
 experiments/*/logs/
 experiments/**/pred_mask/
@@ -19,3 +19,4 @@ benchmarks/MedImgSeg/results/
 benchmarks/SEAM/models/
 benchmarks/MedImgSeg/models/
 benchmark
+experiments/wsss_unet/results/YYF_30Case/imgs_vis/
