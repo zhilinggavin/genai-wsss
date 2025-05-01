@@ -19,4 +19,4 @@ benchmarks/MedImgSeg/results/
 benchmarks/SEAM/models/
 benchmarks/MedImgSeg/models/
 benchmark
-experiments/wsss_unet/results/YYF_30Case/imgs_vis/
+experiments/result_vis/YYF_30Case/labels_vis/

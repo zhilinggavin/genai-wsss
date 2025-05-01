@@ -185,7 +185,7 @@ if __name__ == '__main__':
     load model
     '''
     device = 'cuda'
-    # full_supervised unet model
+    # wsss unet model
     model_path = '../experiments/wsss_unet/checkpoints/fold5_best_dice_epoch45.pth'
     root_dir = '../data/YYF_30Case/preprocessed_size256'
     # root_dir = '../data/YYF_30Case/preprocessed_size256_cropped'
