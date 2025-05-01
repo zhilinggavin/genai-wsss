@@ -3,21 +3,26 @@ import numpy as np
 import SimpleITK as sitk
 from PIL import Image
 import pandas as pd
+from os.path import join
 
-def load_slices(img_dir, caseid, img_dir2 = None):
+def load_slices(img_dir, caseid = None, img_dir2 = None):
     """
     Load 2D image slices from a folder and stack them into a 3D NumPy array.
+    Args:
+        caseid (str): Case ID to filter images in same img dir.
     Returns:
         np.ndarray: 3D volume array (Z, H, W).
     """
-    caseid = caseid.zfill(3)  # Ensure case ID is zero-padded to 3 digits
     file_names = sorted(os.listdir(img_dir))
     
     if img_dir2:
         file_names2 = os.listdir(img_dir2)
         file_names = sorted(file_names + file_names2)
-    
-    file_names = [name for name in file_names if name.startswith(caseid) and name.endswith(('.png', '.jpg', '.jpeg', '.tiff'))]
+    if caseid:
+        caseid = caseid.zfill(3)  # Ensure case ID is zero-padded to 3 digits
+        file_names = [name for name in file_names if name.startswith(caseid) and name.endswith(('.png', '.jpg', '.jpeg', '.tiff'))]
+    else:
+        file_names = [name for name in file_names if name.endswith(('.png', '.jpg', '.jpeg', '.tiff'))]
     slices = []
     
     for fname in file_names:
@@ -45,11 +50,20 @@ def convert_to_nifti(volume_array, save_path):
     # Save as .nii.gz
     sitk.WriteImage(volume_sitk, save_path)
     
-def save_as_nii(caseid, save_path, img_dir, img_dir2 = None):
+def save_as_nii(caseid: str, save_path: str, img_dir: str, img_dir2 = None, subdir: bool=False) -> None:
     """
     Save the 2D slices as a 3D NIfTI file.
+    Args:
+        caseid (str): Case ID to filter images in same img dir.
+        save_path (str): Path to save the NIfTI file.
+        img_dir (str): Directory containing the 2D slices.
+        img_dir2 (str): Additional Directory containing the 2D slices.
+        subdir (bool): Whether to load from subdirectory.
     """
-    volume_array = load_slices(img_dir, caseid, img_dir2)
+    if subdir:
+        volume_array = load_slices(join(img_dir, caseid)) if not img_dir2 else load_slices(join(img_dir, caseid), join(img_dir2, caseid))
+    else:
+        volume_array = load_slices(img_dir, caseid, img_dir2)
     convert_to_nifti(volume_array, save_path)
     print(f"Saved {caseid} to {save_path}")
 

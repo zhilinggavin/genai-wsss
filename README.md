@@ -131,7 +131,9 @@ Quantitative results contain:
 **Visualisation**
 - 2D Vis: Use file `notebooks/labels_vis.ipynb` to compare img, GT, preds etc and save as fig at `experiments/wsss_unet/results/YYF_30Case/imgs_vis`
 - 3D Vis: Use file `notebooks/3d_convert.ipynb` to convert 2d slices (`pred_masks` inferred from different models) back to `.nii.gz`.  
-  3d files saved at `experiments/wsss_unet/results/OSIC/3d_visual`
+  3d files saved at 
+  - `experiments/wsss_unet/results/OSIC/3d_visual`
+  - `experiments/wsss_unet/results/YYF_30Case/preprocessed_size256/3d_visual`
 
 ## Utilities
 - `utils/ct2imgs.py` is used to read `.nii.gz` CT file and save as `2d slices`
