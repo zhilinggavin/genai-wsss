@@ -105,8 +105,13 @@ The corresponding original names can be found in the record file: `data/OSIC/ori
 ### Open Souce - Kits23 Dataset
 contains kidney, tumour, etc... Masks for each elements.
 
-## Results
+## Inference
+**WSSS_Unet**:
+- `src/infer_wsss_unet_OSIC.py` and `infer_wsss_unet_YYF30Case.py`
+- `Pytorch_UNet.unet` is a dependency
 
+
+## Results
 Results are saved in the `experiments` directory under each model's folder.
 
 **Models**: We have evaluated the performance of three segmentation models:
@@ -122,6 +127,16 @@ Each model has **segmentation results & quantitative results**.
 Quantitative results contain:
 - 2D information for each slice
 - 3D information for each case
+
+**Visualisation**
+- 2D Vis: Use file `notebooks/labels_vis.ipynb` to compare img, GT, preds etc and save as fig at `experiments/wsss_unet/results/YYF_30Case/imgs_vis`
+- 3D Vis: Use file `notebooks/3d_convert.ipynb` to convert 2d slices (`pred_masks` inferred from different models) back to `.nii.gz`.  
+  3d files saved at `experiments/wsss_unet/results/OSIC/3d_visual`
+
+## Utilities
+- `utils/ct2imgs.py` is used to read `.nii.gz` CT file and save as `2d slices`
+- `utils/save_nii.py` is used to convert `2d slices` back to `3d CT` for visulisation.  
+  `notebooks/3d_convert.ipynb` is depend on `utils/save_nii.py`.
 
 ### Project Directory Structure
 
