@@ -20,3 +20,4 @@ benchmarks/SEAM/models/
 benchmarks/MedImgSeg/models/
 benchmark
 experiments/result_vis/YYF_30Case/labels_vis/
+data/WSSS4LUAD/
