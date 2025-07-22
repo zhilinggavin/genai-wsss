@@ -200,7 +200,7 @@ if __name__ == '__main__':
         
         data_loader = make_dataloader(img_dir, img_scale=0.5, ids = file_names)
         
-        save_dir = join(save_base_dir,'pred_mask', 'fibrosis_pred')
+        save_dir = join(save_base_dir,'pred_mask')
         os.makedirs(save_dir, exist_ok=True)
         csv_file_path = join(save_base_dir, 'quant', 'slice_check.csv')
         infer(model, data_loader, device, save_dir, csv_file_path)

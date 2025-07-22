@@ -2,7 +2,7 @@
 This repository is under development.
 
 ## Dataset
-This project includes three datasets.
+This project includes Four datasets.
 
 ### In-House - Australian IPF Registry (AIPFR) Dataset
 This dataset comprises Chest HRCT scans from 227 patients and includes cases of fibrosis. No annotation or lables.
@@ -103,7 +103,30 @@ The corresponding original names can be found in the record file: `data/OSIC/ori
   - **Non-fibrosis slices**: 2,691  
 
 ### Open Souce - Kits23 Dataset
-contains kidney, tumour, etc... Masks for each elements.
+2023 Kidney and Kidney Tumor Segmentation challenge (abbreviated KiTS23) datasets can be found [here](https://kits-challenge.org/kits23/)  
+It Contains kidney, tumour, etc... masks for each elements.
+
+### Open Souce - WSSS4LUAD Dataset
+WSSS4LUAD dataset can be found [here](https://wsss4luad.grand-challenge.org).  
+WSSS4LUAD contains H&E stained Whole Slide Image (WSI) for lung adenocarcinoma (LUAD).It contains pixel-level prediction of three common and meaningful tissue types, tumor epithelial tissue, tumor-associated stroma tissue and normal tissue. 
+
+#### Statistics  
+**Training set:**  
+49 WSIs from GDPH and 14 WSIs from TCGA.
+Total 10091 patches were cropped in the training set.  
+Label Distribution:
+
+    Tumor:  6579
+    Stroma:  7076
+    Normal:  1832
+
+**Validation set:**  
+9 WSIs from GDPH and 3  WSIs from TCGA.  
+Total 40 patches were cropped in the validation set. Including 9 large patches (around 1500~5000*1500~5000 ) and 31 small patches (around 200~500*200~500)
+
+**Test set:**   
+9 WSIs from GDPH and 3 WSIs from TCGA.  
+Total 80 patches were cropped in the test set. Including 14 large patches (around 1500~5000*1500~5000 ) and 66 small patches (around 200~500*200~500)
 
 ## Inference
 **WSSS_Unet**:
