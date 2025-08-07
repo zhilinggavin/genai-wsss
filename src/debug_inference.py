@@ -193,21 +193,29 @@ def model_inference(model, data_loader, device, save_dir, csv_file_path):
         #     'pixel_num_fibrosis': pixel_num_fibrosis
         # }
 
+    # # Create a DataFrame
+    # if os.path.exists(csv_file_path):
+    #     df = pd.read_csv(csv_file_path)
+    # else:
+    #     df = pd.DataFrame()
+
     # Create a DataFrame
     if os.path.exists(csv_file_path):
         df = pd.read_csv(csv_file_path)
-    else:
-        df = pd.DataFrame()
+        
+        # Match IDs and update only corresponding rows
+        for i, slice_id in enumerate(ID_check):
+            mask = df['ID'] == slice_id
+            if mask.any():
+                df.loc[mask, 'pixel_num_fibrosis'] = pixel_num_fibrosis_all[i]
 
+    # assert df['ID'].tolist() == ID_check, 'ID paired error'
 
-
-    assert df['ID'].tolist() == ID_check, 'ID paired error'
-
-    # Save the DataFrame to a CSV file
-    if 'pixel_num_lung' not in df.columns:
-        df['pixel_num_lung'] = pixel_num_lung_all
-    df['pixel_num_fibrosis'] = pixel_num_fibrosis_all
-    # df.to_csv(join(base_dir, case_name+'_pixel_infer.csv'), index=False)
+    # # Save the DataFrame to a CSV file
+    # if 'pixel_num_lung' not in df.columns:
+    #     df['pixel_num_lung'] = pixel_num_lung_all
+    # df['pixel_num_fibrosis'] = pixel_num_fibrosis_all
+    # # df.to_csv(join(base_dir, case_name+'_pixel_infer.csv'), index=False)
     df.to_csv(csv_file_path, index=False)
     # header_exists = 'pixel_num_fibrosis' in df.columns
     # df.to_csv(csv_file_path, mode='a', header=not header_exists, index=False)

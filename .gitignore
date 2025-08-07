@@ -21,3 +21,4 @@ benchmarks/MedImgSeg/models/
 benchmark
 experiments/result_vis/YYF_30Case/labels_vis/
 data/WSSS4LUAD/
+data/ct_nii
