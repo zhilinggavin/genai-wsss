@@ -208,6 +208,11 @@ def model_inference(model, data_loader, device, save_dir, csv_file_path):
             mask = df['ID'] == slice_id
             if mask.any():
                 df.loc[mask, 'pixel_num_fibrosis'] = pixel_num_fibrosis_all[i]
+                df.loc[mask, 'slice_volume_fibrosis'] = df.loc[mask, 'voxel'] * pixel_num_fibrosis_all[i]
+            else:
+                raise ValueError(f"ID {slice_id} not found in the DataFrame.")
+    else:
+        raise FileNotFoundError(f"CSV file {csv_file_path} does not exist. Please check the path.")
 
     # assert df['ID'].tolist() == ID_check, 'ID paired error'
 
@@ -224,6 +229,44 @@ def model_inference(model, data_loader, device, save_dir, csv_file_path):
     # print(f'Case {case_name} done!')
     print(f'Pred mask saved to {save_dir}')
     print(f'Pixel number saved to {csv_file_path}')
+    
+def quantify_volumes(csv_file_path):
+    '''
+    Calculate the volume_lung | volume_fibrosis for each case
+    '''
+    default_size = 512
+    quantify_path = os.path.join(os.path.dirname(csv_file_path), 'real_volume_quantification_512.csv')
+
+    df_slice = pd.read_csv(csv_file_path)
+    
+    # Group by case name and process each case separately
+    grouped = df_slice.groupby('Case')
+    
+    all_results = []
+    
+    for case_name, group in grouped:
+        slice_volume_lung = np.array(group['slice_volume_lung'].values)
+        slice_volume_fibrosis = np.array(group['slice_volume_fibrosis'].values)
+
+        size = group['size'].values[0]  # Assuming size is same for all slices of a case
+        ratio_of_real_size = default_size / size if size != 0 else 1
+
+        volume_lung = np.sum(slice_volume_lung) * ratio_of_real_size * ratio_of_real_size
+        volume_fibrosis = np.sum(slice_volume_fibrosis) * ratio_of_real_size * ratio_of_real_size
+
+        result = {
+            'case': case_name,
+            'size': default_size, 
+            'volume_lung': volume_lung,
+            'volume_fibrosis': volume_fibrosis
+        }
+        all_results.append(result)
+
+    # Create dataframe with all results and save
+    df_quantify = pd.DataFrame(all_results)
+    df_quantify.to_csv(quantify_path, index=False)
+    print(f'All cases processed and saved to {quantify_path}')
+    return df_quantify
 
 
 def infer_main(model, device, base_dir, case_name, img_scale, csv_file_path, save_dir = None):
@@ -236,6 +279,7 @@ def infer_main(model, device, base_dir, case_name, img_scale, csv_file_path, sav
 
     data_loader = make_dataloader(case_dir, img_scale)
     model_inference(model, data_loader, device, save_dir, csv_file_path)
+
     
 if __name__ == '__main__': 
     '''
