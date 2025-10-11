@@ -25,3 +25,5 @@ data/ct_nii
 benchmarks/HisynSeg
 genai-wsss-backup-20250810.tar.gz
 experiments/wsss_unet/results/YYF_30Case/imgs_vis/
+
+data/OSIC/ISBI-manipulation/

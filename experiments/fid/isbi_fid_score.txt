@@ -1,0 +1,42 @@
+For each set of manipulated images, calculate the FID score against the opposite original images.
+
+real_images_path = '/media/NAS06/gavinyue/disentanglement/scripts_segmentation/result_exp/fid/no_fibrosis/fid_dataset/orig'
+generated_images_path = f'/media/NAS06/gavinyue/disentanglement/scripts_segmentation/result_exp/fid/no_fibrosis/fid_dataset/manip{ms:.2f}'
+FID Score Bellow:
+manip0.25, FID Score: 4.0427694807389685
+manip0.50, FID Score: 6.975089905895771
+manip0.75, FID Score: 10.336959901343619
+manip1.00, FID Score: 13.647177789010016
+manip1.25, FID Score: 17.18003995623016
+manip1.50, FID Score: 20.636332484858485
+manip1.75, FID Score: 24.133272166514473
+manip2.00, FID Score: 27.67597759642868
+manip2.25, FID Score: 30.78606531919351
+manip2.50, FID Score: 34.42137156928953
+manip2.75, FID Score: 37.697313211668984
+manip3.00, FID Score: 40.967061576923584
+
+real_images_path: /media/NAS06/gavinyue/disentanglement/scripts_segmentation/result_exp/fid/fibrosis/fid_dataset/orig
+FID Score Bellow:
+manip0.25, FID Score: 48.06987200568156
+manip0.50, FID Score: 46.756410411718974
+manip0.75, FID Score: 45.88597466526838
+manip1.00, FID Score: 45.60161203004941
+manip1.25, FID Score: 45.702626961607876
+manip1.50, FID Score: 45.712674283140245
+manip1.75, FID Score: 46.24803890507252
+manip2.00, FID Score: 46.640862562134515
+manip2.25, FID Score: 47.27854358171243
+manip2.50, FID Score: 48.10243187130453
+manip2.75, FID Score: 48.96284880956887
+manip3.00, FID Score: 49.84111387900458
+
+real_images_path: /media/NAS06/gavinyue/disentanglement/scripts_segmentation/result_exp/fid/no_fibrosis/fid_dataset/orig_covid
+FID Score Bellow:
+manip1.25, FID Score: 18.006112711163553
+manip1.50, FID Score: 21.26928983545872
+
+real_images_path: /media/NAS06/gavinyue/disentanglement/scripts_segmentation/result_exp/fid/fibrosis/fid_dataset/orig
+FID Score Bellow:
+manip1.25, FID Score: 28.092460072796797
+manip1.50, FID Score: 28.093175044292906
