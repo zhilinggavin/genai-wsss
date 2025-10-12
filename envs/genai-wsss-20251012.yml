@@ -55,4 +55,10 @@ dependencies:
       - matplotlib==3.10.3
       - lungmask
       - pydicom
+      - opencv-python
+      - scikit-image
+      - lpips
+      - ssim
+      - pytorch-fid
+      - lmdb
 prefix: /media/NAS06/gavinyue/miniconda3/envs/genai-wsss

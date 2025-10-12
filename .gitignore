@@ -27,3 +27,7 @@ genai-wsss-backup-20250810.tar.gz
 experiments/wsss_unet/results/YYF_30Case/imgs_vis/
 
 data/OSIC/ISBI-manipulation/
+
+experiments/tsne/isbi-tsne/manip/manip-20240618/
+experiments/tsne/isbi-tsne/manip/nofib_to_fib/20240627/
+experiments/tsne/isbi-tsne/orig-20240618/

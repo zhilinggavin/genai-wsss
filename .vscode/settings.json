@@ -1,0 +1,12 @@
+// filepath: /media/NAS_R02/USER_PATH/gavinyue/genai-wsss/.vscode/settings.json
+{
+    "python.analysis.exclude": [
+        "benchmarks/**"
+    ],
+    // "files.exclude": {
+    //     "benchmarks": true
+    // },
+    "search.exclude": {
+        "benchmarks": true
+    }
+}
