@@ -4,12 +4,19 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-import pickle
 import cv2
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 
+
+import sys
+sys.path.append("")
+from src.diffae.useage import model_load
+
+import logging
+logging.basicConfig(level=logging.INFO)
+logging.info('fn_diffae.py loaded')
 
 """
     Generate mask for osic
@@ -355,20 +362,15 @@ class Dataset_fibrosis(Dataset):
         ])
 
     def __getitem__(self, index):
-        _label = self.labels[index]
-        # img_folder = '/media/NAS04/yyfang/prognostic_result/dataset/data_fibrosis/slice_select/fibrosis/' if _label == 1 else '/media/NAS04/yyfang/prognostic_result/dataset/data_fibrosis/slice_select/no_fibrosis/'
-        
-        # Gavin dataset: more data
-        
+        _label = self.labels[index] 
         self.img_folder = '/media/NAS04/yyfang/prognostic_result/dataset/data_fibrosis/gavin/slice_select/fibrosis/' if _label == 1 else '/media/NAS04/yyfang/prognostic_result/dataset/data_fibrosis/gavin/slice_select/no_fibrosis/'
-        # img_folder = '/media/NAS04/yyfang/prognostic_result/dataset/data_fibrosis/gavin/slice_select/fibrosis_selected/' if _label == 1 else '/media/NAS04/yyfang/prognostic_result/dataset/data_fibrosis/gavin/slice_select/no_fibrosis_selected/'
-        
         
         try:
             I = Image.open(self.img_folder + self.images[index])
         except FileNotFoundError:
             self.img_folder = '/media/NAS04/yyfang/prognostic_result/dataset/data_fibrosis/gavin/slice_select/no_fibrosis_covid/'
             I = Image.open(self.img_folder + self.images[index])
+            
         from torchvision.transforms import InterpolationMode
         I_resize = trans_fn.resize(I.convert("RGB"), 256, InterpolationMode.LANCZOS)
         _img = self.transform(I_resize)
@@ -462,36 +464,6 @@ def prepare_dataset(bs, dataname='fibrosis', train_mode=False, exp=None):
         print(f'{dataname} data loaded. prepare_dataset Done!')
         return trainset_loader
 
-def model_load(device, diff=True, cls=True):
-    '''
-    Load OLD diff model and classification model, trained by Yingying Fang.
-    '''
-    import torch.nn as nn
-    import sys
-    sys.path.append("/media/NAS06/gavinyue/disentanglement/scripts_segmentation")
-    model_diff = model = None
-    if diff:
-        from templates import ffhq256_autoenc #type: ignore
-        from experiment import LitModel #type: ignore
-        conf = ffhq256_autoenc()
-        model_diff = LitModel(conf)
-        conf.name = 'test_osic256_cluster_mxl_round2'
-        state = torch.load(f'/media/NAS04/yyfang/prognostic_result/xai/counterfactual/Diffusion-Explainer/checkpoints/{conf.name}/last.ckpt', map_location='cpu')
-        model_diff.load_state_dict(state['state_dict'], strict=False)
-        model_diff.ema_model.eval()
-        model_diff.ema_model.to(device)
-        print('OLD model diff loaded')
-    if cls:
-        # load classification model
-        model = nn.Linear(512, 2)
-        model = model.to(device)
-        state_dict = torch.load('/media/NAS04/yyfang/prognostic_result/xai/counterfactual/Diffusion-Explainer/scripts_osic/result_exp/classification_fibrosis/test/model/model_loss_best.pt')['model_state_dict']
-        model.load_state_dict(state_dict)
-        print('OLD classification model loaded')
-
-        # self.direction_class_0 = model.weight[0].detach().cpu().numpy()
-        # self.direction_class_1 = model.weight[1].detach().cpu().numpy()
-    return model_diff, model
 
 
 def load_encode_img(device='cuda',dataname='fibrosis',max_count=30,manip_idx=4,cls=False,exp=None):
