@@ -26,14 +26,16 @@ logging.getLogger('matplotlib.font_manager').setLevel(logging.WARNING)
 BATCH_SIZE = 10
 COUNT = 200
 TYPE: str = 'PCAFIXED'  # 'TSNE' or 'PCA' or 'PCAFIXED'
-MANIP_STRENGTH = [0.5, 0.75, 1.0, 1.25, 1.50, 1.75, 2.0]  # 1.0, 1.5, 2.0
+MANIP_STRENGTH = [0, 0.5, 0.75, 1.0, 1.25, 1.50, 1.75, 2.0]  #[0, 0.5, 0.75, 1.0, 1.25, 1.50, 1.75, 2.0]
 # MANIP_STRENGTH = [1.5]
-LOAD_ROOT = f'experiments/diffae_usage/encoded_shuffled/bs_{BATCH_SIZE}_count{COUNT}'
-SAVE_DIR = f'experiments/tsne/pca/bs_{BATCH_SIZE}_count{COUNT}'
-os.makedirs(SAVE_DIR, exist_ok=True)
 CLS_CHECK: bool = False  # Whether to do classification model check
 CLS_CHECK_value: float = 0.5  # Classification score threshold [0.5, 0.6, 0.7, 0.8, 0.9]
 WEIGHTED: bool = True  # Whether to do weighted t-SNE visualization
+
+LOAD_ROOT = f'experiments/diffae_usage/encoded_shuffled/bs_{BATCH_SIZE}_count{COUNT}'
+SAVE_DIR = f'experiments/tsne/pca/bs_{BATCH_SIZE}_count{COUNT}'
+os.makedirs(SAVE_DIR, exist_ok=True)
+
 # for CLS_CHECK_value in [0.5, 0.6, 0.7, 0.8, 0.9]:
 # load filename list
 file_list = os.path.join(LOAD_ROOT, 'shuffled_filenames_labels.csv')
@@ -51,10 +53,15 @@ filenames_label1 = {k: v for k, v in filenames.items() if v == 1}
 filenames_label0_manip = {k: v for k, v in filenames.items() if v == -1}
 logging.info(f"Total {len(filenames_label0)} files for no_fibrosis (label 0). \n                {len(filenames_label1)} files for fibrosis (label 1). \n                {len(filenames_label0_manip)} files for manipulation (label -1).")
 
+# ------------------ LOAD MODEL ------------------
+device = 'cuda'
+_, model_cls = model_load(device, diff=False, cls=True)
+direction_class_1 = model_cls.direction_class_1.detach().cpu().numpy()
+logging.info("ISBI Classification Models loaded successfully.")
+
 # Global PCA state (fit once on anchors: labels==1 or labels==0)
 PCA_STATE = {
     "fitted": False,
-    "scaler": None,
     "pca": None,
     "x_lim": None,
     "y_lim": None,
@@ -72,15 +79,11 @@ for ms in MANIP_STRENGTH:
     save_path = os.path.join(SAVE_DIR, f'cond_manip{ms}_bs{BATCH_SIZE}_all600.npy')
     tsne_path = save_path.replace('/pca/', '/tsne/')
     cached_path = next((path for path in (save_path, tsne_path) if os.path.isfile(path)), None)
-
+    cond = None
+    
     if cached_path:
         logging.info(f"Encoded condition space already exists at {save_path}, loading it directly.")
         cond = np.load(cached_path)
-        
-        device = 'cuda'
-        _, model_cls = model_load(device, diff=False, cls=True)
-        direction_class_1 = model_cls.direction_class_1.detach().cpu().numpy()
-        logging.info("ISBI Classification Models loaded successfully.")
         
     else:
         logging.info(f"Encoded condition space not found at {save_path}, encoding now.")
@@ -178,7 +181,6 @@ for ms in MANIP_STRENGTH:
         return (cur_min, cur_max), changed
     
     def _fit_anchor_pca(cond_anchors: np.ndarray,
-                    tsne_weight = None,
                     n_components: int = 2,
                     random_state: int = 20,
                     pad_ratio: float = 0.05):
@@ -189,28 +191,25 @@ for ms in MANIP_STRENGTH:
         global PCA_STATE
         X = np.asarray(cond_anchors)
 
-        # Optional feature weighting (e.g., by classifier importances)
-        if tsne_weight is not None:
-            w = np.asarray(tsne_weight)
-            X = X * w
+        # scaler = StandardScaler(with_mean=True, with_std=True)
+        # Xs = scaler.fit_transform(X)
 
-        scaler = StandardScaler(with_mean=True, with_std=True)
-        Xs = scaler.fit_transform(X)
-
-        pca = PCA(n_components=n_components, svd_solver="full", random_state=random_state)
-        Xp = pca.fit_transform(Xs)
+        # Fit PCA without scaler
+        pca = PCA(n_components=n_components, random_state=random_state)
+        Xp = pca.fit_transform(X)
 
         # Fixed axis limits from anchors (+ small padding)
         x_min, x_max = np.min(Xp[:, 0]), np.max(Xp[:, 0])
         y_min, y_max = np.min(Xp[:, 1]), np.max(Xp[:, 1])
-        pad_x = int(pad_ratio * (x_max - x_min + 1e-9))
-        pad_y = int(pad_ratio * (y_max - y_min + 1e-9))
+        pad_x = pad_ratio * (x_max - x_min + 1e-9)
+        pad_y = pad_ratio * (y_max - y_min + 1e-9)
         x_lim = (x_min - pad_x, x_max + pad_x)
         y_lim = (y_min - pad_y, y_max + pad_y)
+        x_lim = tuple(np.ceil(np.array(x_lim) * 10) / 10)
+        y_lim = tuple(np.ceil(np.array(y_lim) * 10) / 10)
 
         PCA_STATE.update({
             "fitted": True,
-            "scaler": scaler,
             "pca": pca,
             "x_lim": x_lim,
             "y_lim": y_lim,
@@ -257,13 +256,13 @@ for ms in MANIP_STRENGTH:
             # 1) If not yet fitted, fit scaler+PCA on anchors (Group1 + Group2) only.
             if not PCA_STATE["fitted"]:
                 anchors = np.vstack([cond[mask1], cond[mask0]])
-                _fit_anchor_pca(anchors, tsne_weight=tsne_weight, n_components=2, random_state=20)
+                _fit_anchor_pca(anchors, n_components=2, random_state=20)
 
-            scaler = PCA_STATE["scaler"]
+            # scaler = PCA_STATE["scaler"]
             pca = PCA_STATE["pca"]
 
             # 2) Transform ALL points (G1/G2/G3) using the fixed pipeline
-            data_all = pca.transform(scaler.transform(cond))
+            data_all = pca.transform(cond)
             logging.info(f"PCA transformed shape: {data_all.shape}")
 
             #  3) Fixed axes from anchors. And expand limits if Group3 goes beyond anchor limits ---
@@ -297,11 +296,7 @@ for ms in MANIP_STRENGTH:
         ax.scatter(data_all[mask0, 0], data_all[mask0, 1], color='green', label=f'No_Fibrosis({a2})', s=10)
         ax.scatter(data_all[maskm, 0], data_all[maskm, 1], color='blue', label=f'Manipulated({a3})', s=10)
 
-        # title = f'No_Fib_Add(a={ms}){weighted_str}{cls_check_str}'
-        if TYPE == 'PCAFIXED' and var1 is not None:
-            title = f'No_Fib_Add(a={ms}){weighted_str}{cls_check_str}(FIXED Ratio: PC1 {var1:.1%}, PC2 {var2:.1%})'
-        else:
-            title = f'No_Fib_Add(a={ms}){weighted_str}{cls_check_str}'
+        title = f'No_Fib_Add(a={ms}){weighted_str}{cls_check_str}_{TYPE}'
         
         ax.set_title(title)
 
