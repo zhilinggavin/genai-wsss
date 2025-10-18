@@ -20,7 +20,7 @@ logging.getLogger("PIL").setLevel(logging.WARNING)
 '''
 IMG_ROOT = 'data/OSIC/processed'
 BATCH_SIZE = 10 #10
-IMG_COUNT = 200 #200
+IMG_COUNT = 400 #200
 fibrosis_dir = os.path.join(IMG_ROOT, 'fibrosis')
 no_fibrosis_dir = os.path.join(IMG_ROOT, 'no_fibrosis')
 
@@ -61,7 +61,7 @@ logging.info(f"Shuffled filenames label 0 (first {IMG_COUNT}): {shuffled_filenam
 logging.info(f"Shuffled filenames label 0 manipulation (first {IMG_COUNT}): {shuffled_filenames_label0_manip[:5]}")
 
 # save as csv for human-readable mapping
-save_list_dir = f'experiments/diffae_usage/encoded_shuffled/bs_{BATCH_SIZE}'
+save_list_dir = f'experiments/diffae_usage/encoded_shuffled/bs_{BATCH_SIZE}_count{IMG_COUNT}'
 os.makedirs(save_list_dir, exist_ok=True)
 import csv
 csv_path = os.path.join(save_list_dir, 'shuffled_filenames_labels.csv')
@@ -77,7 +77,8 @@ with open(csv_path, 'w', newline='') as f:
 
 logging.info(f"Saved shuffled lists to {save_list_dir} (n1={len(shuffled_filenames_label1)}, n0={len(shuffled_filenames_label0)})")
 
-
+exit()
+print("---- Debug Exit ----")
 dataset_label1 = Dataset_diffae_osic(shuffled_filenames_label1, [1]*len(shuffled_filenames_label1))
 dataset_label0 = Dataset_diffae_osic(shuffled_filenames_label0, [0]*len(shuffled_filenames_label0))
 
@@ -99,7 +100,9 @@ logging.info("ISBI Diffae and Classification Models loaded successfully.")
 '''
     Encode image to latent space
 '''
-save_encode = True
+save_encode = False
+
+
 img_cond = []
 img_xT = []
 
@@ -136,24 +139,24 @@ for imgs, labels, names in tqdm(dataloader_label1, total=len(dataloader_label1))
 save_name = f"label1_bs{BATCH_SIZE}_count{count}.pt"
 
 
-if save_encode:
-    # img_cond = np.stack(img_cond, axis=0)
-    img_cond = torch.cat(img_cond, dim=0)
-    img_xT = torch.cat(img_xT, dim=0)
-    img_labels = torch.cat(all_labels, dim=0)
+# if save_encode:
+#     # img_cond = np.stack(img_cond, axis=0)
+#     img_cond = torch.cat(img_cond, dim=0)
+#     # img_xT = torch.cat(img_xT, dim=0)
+#     img_labels = torch.cat(all_labels, dim=0)
 
-    dataname = 'fibrosis' if img_labels.all() == 1 else 'no_fibrosis'
-    logging.info('data loaded: %s', dataname)
-    save_dir = f'experiments/diffae_usage/encoded_shuffled/bs_{BATCH_SIZE}/{dataname}'
-    os.makedirs(save_dir, exist_ok=True)
+#     dataname = 'fibrosis' if img_labels.all() == 1 else 'no_fibrosis'
+#     logging.info('data loaded: %s', dataname)
+#     save_dir = f'experiments/diffae_usage/encoded_shuffled/bs_{BATCH_SIZE}/{dataname}'
+#     os.makedirs(save_dir, exist_ok=True)
     
 
-    savepath = os.path.join(save_dir, save_name)
-    # 1) PyTorch checkpoint (common for deep-learning pipelines)
-    torch.save({
-        'cond': img_cond,   # tensor (N, 256)
-        # 'xT': img_xT,
-        'names': flat_names,        # list of strings
-        'labels': img_labels        # tensor (N,)
-    }, savepath)
-    logging.info(f'{savepath} Saved!')
+#     savepath = os.path.join(save_dir, save_name)
+#     # 1) PyTorch checkpoint (common for deep-learning pipelines)
+#     torch.save({
+#         'cond': img_cond,   # tensor (N, 256)
+#         # 'xT': img_xT,
+#         'names': flat_names,        # list of strings
+#         'labels': img_labels        # tensor (N,)
+#     }, savepath)
+#     logging.info(f'{savepath} Saved!')

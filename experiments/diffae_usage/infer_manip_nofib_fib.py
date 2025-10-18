@@ -23,14 +23,16 @@ logging.getLogger("PIL").setLevel(logging.WARNING)
     Label -1: no_fibrosis for manipulation
 '''
 BATCH_SIZE = 10
-MANIP_STRENGTH = MS = [1.0, 1.5, 2.0]  # 1.0, 1.5, 2.0
-SAVE_ROOT = f'experiments/diffae_usage/encoded_shuffled/bs_{BATCH_SIZE}'
+COUNT = 200 #Each class count
+# MANIP_STRENGTH = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
+MANIP_STRENGTH = [0]
+SAVE_ROOT = f'experiments/diffae_usage/encoded_shuffled/bs_{BATCH_SIZE}_count{COUNT}'
 for ms in MANIP_STRENGTH:
     SAVE_DIR = os.path.join(SAVE_ROOT, f'manip_{ms}_nofib_fib')
     os.makedirs(SAVE_DIR, exist_ok=True)
 
 # load filename list
-file_list = 'experiments/diffae_usage/encoded_shuffled/bs_10/shuffled_filenames_labels.csv'
+file_list = os.path.join(SAVE_ROOT, 'shuffled_filenames_labels.csv')
 import csv
 filenames = {}
 with open(file_list, 'r') as f:

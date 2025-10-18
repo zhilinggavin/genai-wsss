@@ -32,5 +32,6 @@ experiments/tsne/isbi-tsne/manip/manip-20240618/
 experiments/tsne/isbi-tsne/manip/nofib_to_fib/20240627/
 experiments/tsne/isbi-tsne/orig-20240618/
 experiments/diffae_usage/encoded_shuffled/**/*.png
-
-# !experiments/diffae_usage/encoded_shuffled/bs_10/*.csv
+experiments/tsne/pca/**/imgs/
+experiments/tsne/tsne/bs_10_count200/*.npy
+experiments/tsne/tsne/**/imgs/

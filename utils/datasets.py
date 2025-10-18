@@ -2,6 +2,7 @@
 The datasets are for diffusion autoencoder
 '''
 
+import glob
 import os
 from pathlib import Path
 from os import listdir
@@ -16,14 +17,12 @@ import numpy as np
 import random
 from tqdm import tqdm
 
-
-
 import logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 # logging.info(f'Creating dataset with {len(self.ids)} examples')
 
 class Dataset_diffae_osic(Dataset):
-    def __init__(self, x: list[str], y: list[int]):
+    def __init__(self, x: list[str], y: list[int], manip_dir=None):
         self.names = x
         self.labels = y
         self.transform = transforms.Compose([
@@ -31,16 +30,24 @@ class Dataset_diffae_osic(Dataset):
             transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
         ])
         self.root_dir = 'data/OSIC/processed'
+        if manip_dir is not None:
+            self.manip_dir = manip_dir
 
     def __getitem__(self, index):
-        _label = self.labels[index] 
-        self.img_dir = join(self.root_dir, 'fibrosis' if _label == 1 else 'no_fibrosis')
-        
-        try:
-            I = Image.open(join(self.img_dir, self.names[index]))
-        except FileNotFoundError:
-            self.img_dir = '/media/NAS04/yyfang/prognostic_result/dataset/data_fibrosis/gavin/slice_select/no_fibrosis_covid/'
-            I = Image.open(join(self.img_dir, self.names[index]))
+        _label = self.labels[index]
+        if _label == -1 and hasattr(self, 'manip_dir'):
+            # load manipulation from no_fibrosis
+            self.img_dir = self.manip_dir
+            img_path = glob.glob(join(self.img_dir,self.names[index].replace('.png','*.png')))
+            self.names[index] = os.path.basename(img_path[0])
+            I = Image.open(img_path[0])
+        else:
+            self.img_dir = join(self.root_dir, 'fibrosis' if _label == 1 else 'no_fibrosis')
+            try:
+                I = Image.open(join(self.img_dir, self.names[index]))
+            except FileNotFoundError:
+                self.img_dir = '/media/NAS04/yyfang/prognostic_result/dataset/data_fibrosis/gavin/slice_select/no_fibrosis_covid/'
+                I = Image.open(join(self.img_dir, self.names[index]))
 
 
         # from torchvision.transforms import InterpolationMode

@@ -35,7 +35,7 @@ def model_load(device: str, diff: bool = True, cls: bool = True):
         # load classification model
         model_cls = nn.Linear(512, 2)
         model_cls = model_cls.to(device)
-        state_dict = torch.load(f'{root_dir}/experiments/wsss_unet/checkpoints/classifier/isbi_cls_loss_best_499.pt')['model_state_dict']
+        state_dict = torch.load(f'{root_dir}/experiments/wsss_unet/checkpoints/classifier/isbi_cls_loss_best_499.pt', weights_only=True)['model_state_dict']
         
         
         if any(key.startswith('module.') for key in state_dict.keys()):
@@ -50,6 +50,7 @@ def model_load(device: str, diff: bool = True, cls: bool = True):
             model_cls.direction_class_0 = model_cls.weight[0]
             model_cls.direction_class_1 = model_cls.weight[1]
 
+        model_cls.eval()
 
         logging.info('ISBI classification model loaded')
         # setattr(model_cls, 'direction_class_0', model_cls.weight[0].detach().cpu().numpy())
