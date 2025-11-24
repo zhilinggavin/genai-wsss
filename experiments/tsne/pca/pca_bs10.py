@@ -28,9 +28,9 @@ COUNT = 200
 TYPE: str = 'PCAFIXED'  # 'TSNE' or 'PCA' or 'PCAFIXED'
 MANIP_STRENGTH = [0, 0.5, 0.75, 1.0, 1.25, 1.50, 1.75, 2.0]  #[0, 0.5, 0.75, 1.0, 1.25, 1.50, 1.75, 2.0]
 # MANIP_STRENGTH = [1.5]
-CLS_CHECK: bool = False  # Whether to do classification model check
+CLS_CHECK: bool = True  # Whether to do classification model check
 CLS_CHECK_value: float = 0.5  # Classification score threshold [0.5, 0.6, 0.7, 0.8, 0.9]
-WEIGHTED: bool = True  # Whether to do weighted t-SNE visualization
+WEIGHTED: bool = False  # Whether to do weighted t-SNE visualization
 
 LOAD_ROOT = f'experiments/diffae_usage/encoded_shuffled/bs_{BATCH_SIZE}_count{COUNT}'
 SAVE_DIR = f'experiments/tsne/pca/bs_{BATCH_SIZE}_count{COUNT}'
