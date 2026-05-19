@@ -1,5 +1,5 @@
 # Generative-based Weakly Supervised Semantic Segmentation
-This repository is under development.
+This repository is under development. All data restored at `NAS06`, please DO NOT DELETE or MOVE any files without permission.
 
 ## Dataset
 This project includes Four datasets.
